@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>一台电脑玩玩架构 - MySQL主从复制 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="moext" />
+  
+
+  <meta name="description" content="环境准备沿用上一篇操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。 物理机连接MySQL安装完成后先为物理机添加远程访问权限。首先在Master虚拟机登录MySQL，输入命令use mysql切换到mysql库。然后执行如下命令： 1GRANT ALL PRIVILEGES ON *.* TO &amp;apos;root&amp;apos;@&amp;a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一台电脑玩玩架构 - MySQL主从复制">
+<meta property="og:url" content="https://moext.github.io/build-the-structure-on-a-computer-second-part/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="环境准备沿用上一篇操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。 物理机连接MySQL安装完成后先为物理机添加远程访问权限。首先在Master虚拟机登录MySQL，输入命令use mysql切换到mysql库。然后执行如下命令： 1GRANT ALL PRIVILEGES ON *.* TO &amp;apos;root&amp;apos;@&amp;a">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://moext.github.io/images/slave_status.jpg">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一台电脑玩玩架构 - MySQL主从复制">
+<meta name="twitter:description" content="环境准备沿用上一篇操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。 物理机连接MySQL安装完成后先为物理机添加远程访问权限。首先在Master虚拟机登录MySQL，输入命令use mysql切换到mysql库。然后执行如下命令： 1GRANT ALL PRIVILEGES ON *.* TO &amp;apos;root&amp;apos;@&amp;a">
+<meta name="twitter:image" content="https://moext.github.io/images/slave_status.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#环境准备"><span class="toc-text">环境准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#物理机连接MySQL"><span class="toc-text">物理机连接MySQL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL主从配置"><span class="toc-text">MySQL主从配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mastermy-cnf配置"><span class="toc-text">Mastermy.cnf配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slavemy-cnf配置"><span class="toc-text">Slavemy.cnf配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建复制账号"><span class="toc-text">创建复制账号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#查询Master状态"><span class="toc-text">查询Master状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在从库中设置主库信息"><span class="toc-text">在从库中设置主库信息</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开始复制"><span class="toc-text">开始复制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#验证"><span class="toc-text">验证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#补充"><span class="toc-text">补充</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-build-the-structure-on-a-computer-second-part" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">一台电脑玩玩架构 - MySQL主从复制</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.08.30</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/架构/">架构</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>沿用<a href="http://moext.io/build-the-structure-on-a-computer-first-part/" target="_blank" rel="noopener">上一篇</a>操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。</p>
+<h2 id="物理机连接MySQL"><a href="#物理机连接MySQL" class="headerlink" title="物理机连接MySQL"></a>物理机连接MySQL</h2><p>安装完成后先为物理机添加远程访问权限。首先在Master虚拟机登录MySQL，输入命令<code>use mysql</code>切换到mysql库。然后执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &apos;root&apos;@&apos;物理机IP&apos; IDENTIFIED BY &apos;root账户密码&apos; WITH GRANT OPTION;</span><br></pre></td></tr></table></figure>
+<p>执行如下命令使授权生效：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<p>操作完成后，若无法连接，再次确认防火墙是否关闭或查看<code>my.cnf</code>配置文件中<code>bind-address</code>的值是否为<code>0.0.0.0</code>。</p>
+<p>在Slave虚拟机执行上述步骤。</p>
+<h2 id="MySQL主从配置"><a href="#MySQL主从配置" class="headerlink" title="MySQL主从配置"></a>MySQL主从配置</h2><h3 id="Mastermy-cnf配置"><a href="#Mastermy-cnf配置" class="headerlink" title="Mastermy.cnf配置"></a>Master<code>my.cnf</code>配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">设置server_id，一般设置为IP,注意要唯一</span><br><span class="line">server_id = 1 </span><br><span class="line">复制过滤：也就是指定哪个数据库不用同步（mysql库一般不同步）</span><br><span class="line">binlog-ignore-db = mysql  </span><br><span class="line">开启二进制日志功能，以备Slave作为其它Slave的Master时使用</span><br><span class="line">log-bin = edu-mysql-slave1-bin  </span><br><span class="line">为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存</span><br><span class="line">binlog_cache_size = 1M  </span><br><span class="line">主从复制的格式（mixed,statement,row，默认格式是statement）</span><br><span class="line">binlog_format = mixed  </span><br><span class="line">二进制日志自动删除/过期的天数。默认值为0，表示不自动删除。</span><br><span class="line">expire_logs_days = 7  </span><br><span class="line">跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断。</span><br><span class="line">如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致</span><br><span class="line">slave_skip_errors = 1062  </span><br><span class="line">log_slave_updates表示slave将复制事件写进自己的二进制日志</span><br><span class="line">log_slave_updates=1  </span><br><span class="line">防止改变数据(除了特殊的线程)</span><br><span class="line">read_only=1</span><br></pre></td></tr></table></figure>
+<h3 id="Slavemy-cnf配置"><a href="#Slavemy-cnf配置" class="headerlink" title="Slavemy.cnf配置"></a>Slave<code>my.cnf</code>配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">log_bin = mysql-bin</span><br><span class="line">server_id = 2</span><br><span class="line">relay_log = mysql-relay-bin</span><br><span class="line">log_slave_updates = 1</span><br><span class="line">read_only = 1</span><br></pre></td></tr></table></figure>
+<p>如果Slave不是作为其它从库的主库，则没必要开启二进制日志，只需开启<code>relay_log</code>中继日志即可。</p>
+<h3 id="创建复制账号"><a href="#创建复制账号" class="headerlink" title="创建复制账号"></a>创建复制账号</h3><p>执行如下命令，在Master库中建立用于Slave连接的账户和密码并授权连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO slave@&apos;Slave机IP&apos; IDENTIFIED BY &apos;1234&apos;;</span><br></pre></td></tr></table></figure>
+<p>执行如下命令使授权生效：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<h3 id="查询Master状态"><a href="#查询Master状态" class="headerlink" title="查询Master状态"></a>查询Master状态</h3><p>执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show master status;</span><br></pre></td></tr></table></figure>
+<p>记录下返回结果的File列和Position列的值。</p>
+<h3 id="在从库中设置主库信息"><a href="#在从库中设置主库信息" class="headerlink" title="在从库中设置主库信息"></a>在从库中设置主库信息</h3><p>执行如下命令设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CHANGE MASTER TO MASTER_HOST=&apos;Master机IP&apos;, MASTER_USER=&apos;slave&apos;, MASTER_PASSWORD=&apos;1234&apos;, MASTER_LOG_FILE=&apos;mysql-bin.000001&apos;, MASTER_LOG_POS=154;</span><br></pre></td></tr></table></figure>
+<p><code>MASTER_LOG_FILE</code>和<code>MASTER_LOG_POS</code>的值设为主库中查询到的<code>File</code>和<code>Position</code>的值。</p>
+<h2 id="开始复制"><a href="#开始复制" class="headerlink" title="开始复制"></a>开始复制</h2><p>在从库中执行命令<code>start slave;</code>启用复制。运行<code>show slave status\G;</code>查看输出结果：</p>
+<div align="center"><img src="/images/slave_status.jpg"></div>
+
+<p><code>Slave_IO_Running</code>与<code>Slave_SQL_Running</code>的值都为<code>Yse</code>时，说明Slave的I/O和SQL线程都开始了，当主库二进制日志文件发生改变时，从库会先把二进制日志文件拷贝到它的中继日志里，从库重做中继日志里的事件，将更新反映到它自己的数据库。</p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>在Master和Slave新建<code>test</code>数据库<code>user</code>数据表，必须保持库和表一致。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create database test;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `users` (</span><br><span class="line">  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `username` varchar(255) DEFAULT NULL,</span><br><span class="line">  `password` varchar(255) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</span><br></pre></td></tr></table></figure>
+<p>在主库插入一条数据，在从库查看是否同步。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">insert into users (username, password) values (&apos;张三&apos;, &apos;123456&apos;);</span><br></pre></td></tr></table></figure>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>在上次验证的时候，先在Master建立了数据库，以为Slave随后会同步，然而并没有。在Slave<code>show slave status;</code>查看从库状态，报错了(具体记不清楚，现在无法复现)。所以想当然的认为，在保持数据同步之前，主从数据库必须具有相同的库和表才行。今天仔细翻看了MySQL文档，了解到二进制日志复制数据共有三种方式，一是基于SQL语句，二是基于行改变，最后是前两者结合。MySQL默认使用第一种方式，既然是基于语句的方式复制数据，那么当在主库上创建了数据库，肯定会将SQL记录到二进制日志中。从库没道理不同步的。于是在Master新建库新建表，在Slave查看，果然同步了。至于那个报错，有机会出现再探究一下原因。</p>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/build-the-structure-on-a-computer-first-part/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/custom-logger-in-laravel5-5/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

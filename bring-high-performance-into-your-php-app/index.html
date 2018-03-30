@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>(译)提升PHP程序性能 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="PHP," />
+  
+
+  <meta name="description" content="这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。   在一个大的Symfony应用程序里使用这个方法，能够使每秒处理请求量从130提升到的20">
+<meta name="keywords" content="PHP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)提升PHP程序性能">
+<meta property="og:url" content="https://moext.github.io/bring-high-performance-into-your-php-app/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。   在一个大的Symfony应用程序里使用这个方法，能够使每秒处理请求量从130提升到的20">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://marcjschmidt.de/images/morpheus-php-webserver.png">
+<meta property="og:image" content="http://marcjschmidt.de/images/morpheus-php-balancing.png">
+<meta property="og:image" content="http://marcjschmidt.de/images/reactphp-with-nginx.png">
+<meta property="og:image" content="http://marcjschmidt.de/images/reactphp-benchmark-requests.png">
+<meta property="og:image" content="http://marcjschmidt.de/images/reactphp-benchmark-memory.png">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)提升PHP程序性能">
+<meta name="twitter:description" content="这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。   在一个大的Symfony应用程序里使用这个方法，能够使每秒处理请求量从130提升到的20">
+<meta name="twitter:image" content="http://marcjschmidt.de/images/morpheus-php-webserver.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#体系结构"><span class="toc-text">体系结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在盒子外思考"><span class="toc-text">在盒子外思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#等等，什么？"><span class="toc-text">等等，什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#怎么回事？"><span class="toc-text">怎么回事？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基准时间"><span class="toc-text">基准时间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nginx负载均衡"><span class="toc-text">nginx负载均衡</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#采用这种方法的问题"><span class="toc-text">采用这种方法的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后的思考"><span class="toc-text">最后的思考</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-bring-high-performance-into-your-php-app" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">(译)提升PHP程序性能</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.06.20</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/programming/">编程</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <blockquote>
+<p>这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。</p>
+</blockquote>
+<blockquote>
+<p>在一个大的Symfony应用程序里使用这个方法，能够使每秒处理请求量从130提升到的2000</p>
+</blockquote>
+<h2 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h2><p>先来回顾一下“历史”。<br>我们一贯的做法是使用一些众所周知的web服务器(apache、nginx等)来配合PHP处理HTTP协议并将动态请求重定向到PHP，与Apache的mod_rewrite这样的重写引擎一起变得非常强大。</p>
+<p>配置web服务器运行PHP的几种方法：</p>
+<ul>
+<li>mod_php(只适用apache)</li>
+<li>f(ast)cgi</li>
+<li>php-fpm</li>
+</ul>
+<p>考虑到安全因素，通常配置使用FCGI和<a href="http://man.chinaunix.net/newsoft/ApacheManual/suexec.html" target="_blank" rel="noopener">SuExec</a>，保证每个解释器进程都在特定的站点用户下运行。这种分离使得每个客户机无需虚拟机就可以进行大规模的托管。在本地开发机或单一的应用程序服务器使用mod_php或php-fpm是很常见的。</p>
+<p>这些配置在整个行业内都很常见。但是不得不说一下它的缺点，即使开启了<code>opcode cache</code>(操作码缓存)，每当有新的请求时，仍需要声明类、实例化类、读取缓存。正如你想象的那样，这是非常耗时的，远不是高性能配置。</p>
+<h2 id="在盒子外思考"><a href="#在盒子外思考" class="headerlink" title="在盒子外思考"></a>在盒子外思考</h2><p>那么，我们为什么要这么做呢？为什么在每次请求之后，都会销毁PHP为应用程序所建立的内存，再次请求后再重新建立内存呢？嗯，这是因为PHP起初的设计理念只是一个模板引擎、一套工具，并不是基于服务端的语言。PHP本身并不是真正的异步设计，几乎所有的功能都是“阻塞”的。多年来PHP发生巨大的变化，现在，我们使用PHP能够写出强大的模板引擎，得益于composer丰富的扩展库，PHP已经有了一个健全的“生态系统”。总之，其它语言有的我们要有，其它语言没有的我们也要有，PHP是全世界最好的语言。(原作太长，一句话概括下)。我们甚至有PHP的异步Web服务器库。</p>
+<h2 id="等等，什么？"><a href="#等等，什么？" class="headerlink" title="等等，什么？"></a>等等，什么？</h2><p>等等，我们有PHP异步库？是的，<a href="http://reactphp.org/" target="_blank" rel="noopener">我们有</a>。ReactPHP对“我”来说是一个最有前途的PHP库，它带来了事件驱动的强大概念和非阻塞I/O。运用这项技术，我们能够在PHP中编写自己的HTTP堆栈，并在每次请求结束时将其控制在内存中而不是销毁它。</p>
+<div align="center"><img src="http://marcjschmidt.de/images/morpheus-php-webserver.png"></div>
+
+<p>这很易于理解，当我们不需要实例化所有的对象时，读缓存，我们将获得更多的性能。因为大部分时间引导应用程序是响应时间的一个重要因素。当移除这些因素，它的机制就类似java、nodejs和Co那样。</p>
+<h2 id="怎么回事？"><a href="#怎么回事？" class="headerlink" title="怎么回事？"></a>怎么回事？</h2><p>So easy！只需使用<a href="http://reactphp.org" target="_blank" rel="noopener">ReactPHP</a>即可。</p>
+<p>使用composer安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer require &apos;react/react=*&apos;</span><br></pre></td></tr></table></figure></p>
+<p>然后创建文件<code>server.php</code>并调用它：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">require &apos;vendor/autoload.php&apos;;</span><br><span class="line">$i = 0;</span><br><span class="line">$app = function ($request, $response) use ($i) &#123;</span><br><span class="line">    $response-&gt;writeHead(200, array(&apos;Content-Type&apos; =&gt; &apos;text/plain&apos;));</span><br><span class="line">    $response-&gt;end(&quot;Hello World $i\n&quot;);</span><br><span class="line">    $i++;</span><br><span class="line">&#125;;</span><br><span class="line">$loop = React\EventLoop\Factory::create();</span><br><span class="line">$socket = new React\Socket\Server($loop);</span><br><span class="line">$http = new React\Http\Server($socket, $loop);</span><br><span class="line">$http-&gt;on(&apos;request&apos;, $app);</span><br><span class="line">echo &quot;Server running at http://127.0.0.1:1337\n&quot;;</span><br><span class="line">$socket-&gt;listen(1337);</span><br><span class="line">$loop-&gt;run();</span><br></pre></td></tr></table></figure></p>
+<p>现在你可以用<code>server.php</code>开始你的第一个PHP Web服务器。打开浏览器访问<code>http://127.0.0.1:1337</code>，将会看到<code>Hello World</code>的消息。应用程序是主函数，它是每个请求的入口点。</p>
+<h2 id="基准时间"><a href="#基准时间" class="headerlink" title="基准时间"></a>基准时间</h2><p>现在你可能会想，“嗯，PHP只使用一个CPU线程，它没有利用我的多核服务器的整体能力”。确实如此，但是，</p>
+<div align="center"><img src="http://marcjschmidt.de/images/morpheus-php-balancing.png"></div>
+
+<p>现在我们需要一个多核服务器来产生一些进程，(大概意思是他写了一个东西)，地址是：<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">https://github.com/php-pm/php-pm”</a></p>
+<p>看如下所示设置：</p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-with-nginx.png"></div>
+
+<p>安装程序：</p>
+<ul>
+<li>Intel(R) Xeon(R) CPU L5630, 6 Cores</li>
+<li>8GB RAM</li>
+<li>PHP 5.4.4 with APC</li>
+<li>Debian 7.1</li>
+<li>nginx/1.2.1</li>
+</ul>
+<p>PHP-FPM和React服务器都有6个子进程</p>
+<p>使用Apache HTTP服务器基准测试工具进行测试(ab)。</p>
+<p>我们现在要测试的是一个基于symfony2.4+的Web应用程序，<a href="https://github.com/jarves/jarves" target="_blank" rel="noopener">地址点这里</a>，这是一个包含模板、缓存、数据库、事件监听等多项服务的CMS系统。</p>
+<p>缓存配置只缓存基本内容，视图的结果不缓存，所以我们没有缓存更多的数据。</p>
+<p>启动React服务器的命令是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php ./bin/ppm start /path/to/symfony/ --bridge=symfony -vvv</span><br></pre></td></tr></table></figure></p>
+<p>hhvm：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hhvm ./bin/ppm start /path/to/symfony/ --bridge=symfony -vvv</span><br></pre></td></tr></table></figure></p>
+<p>结果如下：</p>
+<p><strong>每秒请求数</strong></p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-benchmark-requests.png"></div>
+
+<p><strong>内存使用</strong></p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-benchmark-memory.png"></div>
+
+<p><strong>说明</strong></p>
+<ul>
+<li>fpm - nginx服务后面的常规php-fpm服务</li>
+<li>react - React与内置负载均衡服务器(见上上上图)</li>
+<li>react+nginx - React与nginx负载均衡服务器。React只负责产生服务器子进程，nginx用于连接子进程。</li>
+<li>hhvm - 作为开启hhvm的React服务器</li>
+<li>hhvm+nginx - 作为开启hhvm的React+nginx服务器</li>
+</ul>
+<p>hhvm使用<code>stream_select</code>事件循环，PHP使用<code>libevent</code>，所以，我们不使用hhvm内置的Web服务器。</p>
+<p>正如我们所看到的，React+nginx负载均衡服务器比传统PHP+APC快15倍之多，每秒也可以应付2000的请求量。如果是这样的结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">	    2.000 requests / second</span><br><span class="line">    7.200.000 requests / hour</span><br><span class="line">   86.400.000 requests / half day</span><br><span class="line">  172.800.000 requests / day</span><br><span class="line">2.678.400.000 requests / half month</span><br><span class="line">5.356.800.000 requests / month</span><br></pre></td></tr></table></figure>
+<p>内存使用率几乎一样，内存连续增加可能是因为CMS内存泄露引起的。这样的环境还没有优化，请参见下面获取更多有关此方法问题的信息。</p>
+<p>(大概意思是推荐你试一试)</p>
+<h2 id="nginx负载均衡"><a href="#nginx负载均衡" class="headerlink" title="nginx负载均衡"></a>nginx负载均衡</h2><p>react+nginx和hhvm+nginx配置如下：</p>
+<p>我们在这里所做的只是代理请求而并不指向本地文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">upstream backend  &#123;</span><br><span class="line">    server 127.0.0.1:5501;</span><br><span class="line">    server 127.0.0.1:5502;</span><br><span class="line">    server 127.0.0.1:5503;</span><br><span class="line">    server 127.0.0.1:5504;</span><br><span class="line">    server 127.0.0.1:5505;</span><br><span class="line">    server 127.0.0.1:5506;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    root /path/to/symfony/web/;</span><br><span class="line">    server_name servername.com</span><br><span class="line">    location / &#123;</span><br><span class="line">        if (!-f $request_filename) &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="采用这种方法的问题"><a href="#采用这种方法的问题" class="headerlink" title="采用这种方法的问题"></a>采用这种方法的问题</h2><p>使用这种方法一定要注意的几个问题。</p>
+<p>1.我们必须更好地处理内存以避免泄漏。PHP的较新版本做得相当不错，但是在处理请求之后破坏整个应用程序的内存的旧方法并不重视这个话题。(翻译的不好)</p>
+<p>2.每次文件更改时，我们必须重新启动服务器。因为在PHP中不可能重新定义“符号”(类、方法)。我计划通过<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">PHP进程管理器</a>来解决这个问题，用它来启动子进程。</p>
+<p>3.当抛出异常时，必须重新启动服务器。我计划通过<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">PHP进程管理器</a>找到一个解决方案。</p>
+<p>4.尽管ReactPHP具有异步能力，但是并没有被主流框架所支持。这意味着，如果你要提升web程序的性能，必须使用异步方式重写你的应用程序。这是可以实现的，总的来说更快，但这是一项极其复杂的工程。因此，可以借鉴Node.js如何使用异步。我的意见是值得一试。</p>
+<p>5.如果你用ReactPHP重构框架，必须确保该框架能够根据请求分离其内部数据。例如，Symfony框架。</p>
+<h2 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h2><p><a href="http://marcjschmidt.de/blog/2014/02/08/php-high-performance.html" target="_blank" rel="noopener">原文链接</a></p>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/the-server-login-do-not-use-password/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/build-the-structure-on-a-computer-first-part/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

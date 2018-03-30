@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>简单的代码部署 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="PHP," />
+  
+
+  <meta name="description" content="个人项目的代码保存在Git仓库里，不定时提交，每次push之后，想在线上预览效果，都得登录服务器执行pull，觉得很繁琐。因为对实时性无要求，所以写了个简单的脚本，设置定时任务，每晚十一点半pull代码，第二天就能预览了。 首先在服务器上建立一个与项目目录同级的文件，这里取名为pull.php，编辑内容如下：123456&amp;lt;?php    #!/usr/local/php/bin/php -q">
+<meta name="keywords" content="PHP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单的代码部署">
+<meta property="og:url" content="https://moext.github.io/simple-code-deploy/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="个人项目的代码保存在Git仓库里，不定时提交，每次push之后，想在线上预览效果，都得登录服务器执行pull，觉得很繁琐。因为对实时性无要求，所以写了个简单的脚本，设置定时任务，每晚十一点半pull代码，第二天就能预览了。 首先在服务器上建立一个与项目目录同级的文件，这里取名为pull.php，编辑内容如下：123456&amp;lt;?php    #!/usr/local/php/bin/php -q">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简单的代码部署">
+<meta name="twitter:description" content="个人项目的代码保存在Git仓库里，不定时提交，每次push之后，想在线上预览效果，都得登录服务器执行pull，觉得很繁琐。因为对实时性无要求，所以写了个简单的脚本，设置定时任务，每晚十一点半pull代码，第二天就能预览了。 首先在服务器上建立一个与项目目录同级的文件，这里取名为pull.php，编辑内容如下：123456&amp;lt;?php    #!/usr/local/php/bin/php -q">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-simple-code-deploy" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">简单的代码部署</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2016.08.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/programming/">编程</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>个人项目的代码保存在Git仓库里，不定时提交，每次push之后，想在线上预览效果，都得登录服务器执行pull，觉得很繁琐。因为对实时性无要求，所以写了个简单的脚本，设置定时任务，每晚十一点半pull代码，第二天就能预览了。</p>
+<p>首先在服务器上建立一个与项目目录同级的文件，这里取名为<code>pull.php</code>，编辑内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    #!/usr/local/php/bin/php -q							// php可执行命令</span><br><span class="line">    $target = &apos;/data/wwwroot/codecourse&apos;;				// 项目路径</span><br><span class="line">    $cmd = &apos;cd &apos;.$target.&apos; &amp;&amp; git pull&apos;;				// 操作命令</span><br><span class="line">    echo $cmd .&apos; --- &apos;. date(&apos;Y-m-d H:i:s&apos;) . PHP_EOL;	// 输出信息</span><br><span class="line">    echo  shell_exec($cmd) . PHP_EOL;					// 输出执行结果</span><br></pre></td></tr></table></figure></p>
+<p>crontab内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">30 23 * * * /usr/local/php/bin/php -f /data/wwwroot/pull.php &gt;&gt; /data/wwwroot/git.log</span><br></pre></td></tr></table></figure></p>
+<p>再建立一个同级的日志文件，用来记录定时任务每次执行的结果，这里取名为<code>git.log</code>。为这个文件赋可写入权限。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cd /data/wwwroot/codecourse &amp;&amp; git pull --- 2017-05-08 23:30:01</span><br><span class="line">Updating 3504c48..8b251d7</span><br><span class="line">Fast-forward</span><br><span class="line"> app/Http/Constants/ErrCode.php                     |    6 +</span><br><span class="line"> .../Controllers/Web/Frontend/AccountController.php |   29 +++++-</span><br><span class="line"> .../Controllers/Web/Frontend/SendController.php    |    2 +-</span><br><span class="line"> app/Http/Helpers/Response.php                      |   16 +++</span><br><span class="line"> app/Http/Models/Cores/Account.php                  |   28 +++++-</span><br><span class="line"> app/Http/Models/Services/Sender/Message.php        |   97 ++++++++++++++++++-</span><br><span class="line"> config/app.php                                     |    2 +-</span><br><span class="line"> resources/views/frontend/register.blade.php        |   99 ++++++++++++--------</span><br><span class="line"> resources/views/layout/master.blade.php            |    2 +-</span><br><span class="line"> 9 files changed, 221 insertions(+), 60 deletions(-)</span><br><span class="line"> create mode 100644 app/Http/Helpers/Response.php</span><br></pre></td></tr></table></figure></p>
+<p>最后，注意一下<code>shell_exec</code>方法在<code>php.ini</code>配置文件里是否启用。</p>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/the-third-part-of-mongodb/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/the-server-login-do-not-use-password/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

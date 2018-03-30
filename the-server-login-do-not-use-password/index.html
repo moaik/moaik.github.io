@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>服务器免密码登录 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Linux," />
+  
+
+  <meta name="description" content="本机配置1.生成ssh key1ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里 2.将ssh key拷贝到远程主机1scp ~/.ssh/id_rsa.pub root@192.168.8.80:/root/.ssh/id_rsa.pub 远程机配置1.创建用于存储ssh key的文件，并修改此文件权限12touch /root/.ssh/author">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="服务器免密码登录">
+<meta property="og:url" content="https://moext.github.io/the-server-login-do-not-use-password/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="本机配置1.生成ssh key1ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里 2.将ssh key拷贝到远程主机1scp ~/.ssh/id_rsa.pub root@192.168.8.80:/root/.ssh/id_rsa.pub 远程机配置1.创建用于存储ssh key的文件，并修改此文件权限12touch /root/.ssh/author">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="服务器免密码登录">
+<meta name="twitter:description" content="本机配置1.生成ssh key1ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里 2.将ssh key拷贝到远程主机1scp ~/.ssh/id_rsa.pub root@192.168.8.80:/root/.ssh/id_rsa.pub 远程机配置1.创建用于存储ssh key的文件，并修改此文件权限12touch /root/.ssh/author">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#本机配置"><span class="toc-text">本机配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#远程机配置"><span class="toc-text">远程机配置</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-the-server-login-do-not-use-password" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">服务器免密码登录</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.05.25</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/programming/">编程</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="本机配置"><a href="#本机配置" class="headerlink" title="本机配置"></a>本机配置</h2><p>1.生成<code>ssh key</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里</span><br></pre></td></tr></table></figure></p>
+<p>2.将<code>ssh key</code>拷贝到远程主机<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp ~/.ssh/id_rsa.pub root@192.168.8.80:/root/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure></p>
+<h2 id="远程机配置"><a href="#远程机配置" class="headerlink" title="远程机配置"></a>远程机配置</h2><p>1.创建用于存储<code>ssh key</code>的文件，并修改此文件权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch /root/.ssh/authorized_keys</span><br><span class="line">chmod 600 /root/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></p>
+<p><code>authorized_keys</code>为默认文件名，如若修改，可编辑<code>/etc/ssh/sshd_config</code>文件。</p>
+<p>2.将<code>id_rsa.pub</code>的内容追加到<code>authorized_keys</code>中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /root/.ssh/id_rsa.pub  &gt;&gt; /root/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></p>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/simple-code-deploy/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/bring-high-performance-into-your-php-app/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

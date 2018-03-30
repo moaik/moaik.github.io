@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>MongoDB - CURD操作 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="NoSQL," />
+  
+
+  <meta name="description" content="在上一篇介绍了如何为PHP安装mongodb扩展并连接MongoDB数据库，接下来尝试使用PHP进行CURD操作。 插入沿用上一篇创建的test.php文件，编辑内容如下并执行12345678&amp;lt;?phprequire_once __DIR__ . &amp;quot;/vendor/autoload.php&amp;quot;;			# 为了少写几行字 以后代码中此行省略$collection = (new">
+<meta name="keywords" content="NoSQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB - CURD操作">
+<meta property="og:url" content="https://moext.github.io/the-third-part-of-mongodb/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="在上一篇介绍了如何为PHP安装mongodb扩展并连接MongoDB数据库，接下来尝试使用PHP进行CURD操作。 插入沿用上一篇创建的test.php文件，编辑内容如下并执行12345678&amp;lt;?phprequire_once __DIR__ . &amp;quot;/vendor/autoload.php&amp;quot;;			# 为了少写几行字 以后代码中此行省略$collection = (new">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MongoDB - CURD操作">
+<meta name="twitter:description" content="在上一篇介绍了如何为PHP安装mongodb扩展并连接MongoDB数据库，接下来尝试使用PHP进行CURD操作。 插入沿用上一篇创建的test.php文件，编辑内容如下并执行12345678&amp;lt;?phprequire_once __DIR__ . &amp;quot;/vendor/autoload.php&amp;quot;;			# 为了少写几行字 以后代码中此行省略$collection = (new">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#插入"><span class="toc-text">插入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查找"><span class="toc-text">查找</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改"><span class="toc-text">修改</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#删除"><span class="toc-text">删除</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-the-third-part-of-mongodb" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">MongoDB - CURD操作</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2016.05.18</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/programming/">编程</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>在<a href="http://moext.io/the-second-part-of-mongodb/" target="_blank" rel="noopener">上一篇</a>介绍了如何为PHP安装mongodb扩展并连接MongoDB数据库，接下来尝试使用PHP进行CURD操作。</p>
+<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><p>沿用上一篇创建的<code>test.php</code>文件，编辑内容如下并执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">require_once __DIR__ . &quot;/vendor/autoload.php&quot;;			# 为了少写几行字 以后代码中此行省略</span><br><span class="line">$collection = (new MongoDB\Client)-&gt;example-&gt;users;		# 此行省略</span><br><span class="line">$collection-&gt;insertOne([</span><br><span class="line">    &apos;username&apos; =&gt; &apos;admin&apos;,</span><br><span class="line">    &apos;email&apos; =&gt; &apos;admin@example.com&apos;,</span><br><span class="line">    &apos;name&apos; =&gt; &apos;Admin User&apos;,</span><br><span class="line">]);</span><br></pre></td></tr></table></figure></p>
+<p>文件没报错的话就是插入成功了。嗯(一脸懵逼.jpg)，啥也看不到怎么确定插进去了呢？那现在执行<code>mongo</code>进入MongoDB命令行交互界面验证一下。在验证之前，先了解一点，看下<code>test.php</code>文件的第二行的<code>example</code>和<code>users</code>分别表示什么。MongoDB支持在插入数据的时候自动创建数据库与集合，也就是说无需提前创建再插入数据。<code>users</code>表示集合，可以理解为MySQL中的表，只是存储形式不同。在终端执行如下命令验证:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use example			# 切换到example数据库</span><br><span class="line">show collections	# 显示当前数据库中的集合 可以看到users</span><br><span class="line">db.users.find()     # 查看user集合中的数据</span><br></pre></td></tr></table></figure></p>
+<p>显示内容如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; &quot;_id&quot; : ObjectId(&quot;591d840df2d3e11cdb349e72&quot;), &quot;username&quot; : &quot;admin&quot;, &quot;email&quot; : &quot;admin@example.com&quot;, &quot;name&quot; : &quot;Admin User&quot; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，插入之后多了一组数据<code>&quot;_id&quot; : ObjectId(&quot;591d840df2d3e11cdb349e72&quot;)</code>，这是MongoDB自动生成的唯一ID，如果想覆盖它，比如改成用户自增ID或其它具有唯一约束的值，可以使用如下方式插入，注意，键值必须为<code>_id</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$collection-&gt;insertOne([&apos;_id&apos; =&gt; 1, &apos;name&apos; =&gt; &apos;UserName&apos;]);</span><br></pre></td></tr></table></figure></p>
+<p>嗯(有点激动.jpg)，插进去了。插入多条数据也应该十分容易的了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$collection-&gt;insertMany([</span><br><span class="line">    [</span><br><span class="line">        &apos;username&apos; =&gt; &apos;admin&apos;,</span><br><span class="line">        &apos;email&apos; =&gt; &apos;admin@example.com&apos;,</span><br><span class="line">        &apos;name&apos; =&gt; &apos;Admin User&apos;,</span><br><span class="line">    ],</span><br><span class="line">    [</span><br><span class="line">        &apos;username&apos; =&gt; &apos;test&apos;,</span><br><span class="line">        &apos;email&apos; =&gt; &apos;test@example.com&apos;,</span><br><span class="line">        &apos;name&apos; =&gt; &apos;Test User&apos;,</span><br><span class="line">    ],</span><br><span class="line">]);</span><br></pre></td></tr></table></figure></p>
+<h2 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h2><p>现在修改一下<code>test.php</code>文件，来试试查找。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$document = $collection-&gt;findOne([&apos;_id&apos; =&gt; 1]);</span><br><span class="line">var_dump($document);</span><br></pre></td></tr></table></figure></p>
+<p>执行文件输出结果如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">object(MongoDB\Model\BSONDocument)#13 (1) &#123;</span><br><span class="line">  [&quot;storage&quot;:&quot;ArrayObject&quot;:private]=&gt;</span><br><span class="line">  array(2) &#123;</span><br><span class="line">    [&quot;_id&quot;]=&gt;</span><br><span class="line">    int(1)</span><br><span class="line">    [&quot;name&quot;]=&gt;</span><br><span class="line">    string(7) &quot;UserName&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>要注意<code>_id</code>的数据类型，如果插入的时候是字符串类型，查找时必须保持类型一致。细说查找大概需要很长的篇幅，这里先简单介绍下CURD，以后有时间再单独具体说一下MongoDB的查找操作。</p>
+<h2 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h2><p>现在我感觉之前插入的东西太乱了，想要清空之后再插入新的数据，嗯(小心翼翼.jpg)，在终端执行如下命令:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.users.drop() 		# 返回true表示users集合已被删除</span><br></pre></td></tr></table></figure></p>
+<p>重新插入数据:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$collection-&gt;insertOne([</span><br><span class="line">	&apos;_id&apos; =&gt; 1, </span><br><span class="line">	&apos;gender&apos; =&gt; &apos;women&apos;,</span><br><span class="line">	&apos;age&apos; =&gt; 55,</span><br><span class="line">	&apos;name&apos; =&gt; &apos;武藤兰&apos;</span><br><span class="line">]);</span><br></pre></td></tr></table></figure></p>
+<p>日月如他妈的梭，光阴似他妈的箭，后来你发现曾经年轻的武藤兰不再年轻了，后来你发现有个叫大桥未久的还算不错，那现在试着更新下<code>name</code>试试<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$collection-&gt;updateOne(</span><br><span class="line">    [&apos;_id&apos; =&gt; 1],</span><br><span class="line">    [&apos;$set&apos; =&gt; [&apos;age&apos; =&gt; 28, &apos;name&apos; =&gt; &apos;大桥未久&apos;]]</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>查看结果，嗯(满心欢喜.jpg)，成功了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">db.users.find()</span><br><span class="line">&#123; &quot;_id&quot; : 1, &quot;gender&quot; : &quot;women&quot;, &quot;age&quot; : 28, &quot;name&quot; : &quot;大桥未久&quot; &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>撸前淫如魔，撸后圣如佛。你是不是突然间感觉很没意思了，那把大桥未久删除了吧。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$collection-&gt;deleteOne([&apos;name&apos; =&gt; &apos;大桥未久&apos;]);</span><br></pre></td></tr></table></figure></p>
+<p>嗯(没有照片符合老子现在的心情.jpg)……</p>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/the-second-part-of-mongodb/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/simple-code-deploy/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

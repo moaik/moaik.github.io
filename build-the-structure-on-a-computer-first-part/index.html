@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>一台电脑玩玩架构 - Nginx反向代理 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="moext" />
+  
+
+  <meta name="description" content="环境准备物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用virtualbox，操作系统使用CentOS6.9 x86_64最小镜像。NMP(Nginx、MySQL、PHP)使用部署脚本安装。 安装操作系统虚拟机安装操作系统在此不作细述，需要注意两点，一是配置虚拟机网络为桥接方式，二是关闭虚拟机防火墙。    虚拟机网络配置如上图。配置完成后，在虚拟机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一台电脑玩玩架构 - Nginx反向代理">
+<meta property="og:url" content="https://moext.github.io/build-the-structure-on-a-computer-first-part/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="环境准备物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用virtualbox，操作系统使用CentOS6.9 x86_64最小镜像。NMP(Nginx、MySQL、PHP)使用部署脚本安装。 安装操作系统虚拟机安装操作系统在此不作细述，需要注意两点，一是配置虚拟机网络为桥接方式，二是关闭虚拟机防火墙。    虚拟机网络配置如上图。配置完成后，在虚拟机">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://moext.github.io/images/network_config.jpg">
+<meta property="og:image" content="https://moext.github.io/images/proxy1.jpg">
+<meta property="og:image" content="https://moext.github.io/images/proxy2.jpg">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一台电脑玩玩架构 - Nginx反向代理">
+<meta name="twitter:description" content="环境准备物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用virtualbox，操作系统使用CentOS6.9 x86_64最小镜像。NMP(Nginx、MySQL、PHP)使用部署脚本安装。 安装操作系统虚拟机安装操作系统在此不作细述，需要注意两点，一是配置虚拟机网络为桥接方式，二是关闭虚拟机防火墙。    虚拟机网络配置如上图。配置完成后，在虚拟机">
+<meta name="twitter:image" content="https://moext.github.io/images/network_config.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#环境准备"><span class="toc-text">环境准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装操作系统"><span class="toc-text">安装操作系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在虚拟机安装软件"><span class="toc-text">在虚拟机安装软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#物理机Nginx配置"><span class="toc-text">物理机Nginx配置</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-build-the-structure-on-a-computer-first-part" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">一台电脑玩玩架构 - Nginx反向代理</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.08.28</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/架构/">架构</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用<a href="https://www.virtualbox.org/wiki/Downloads" target="_blank" rel="noopener">virtualbox</a>，操作系统使用<a href="http://isoredirect.centos.org/centos/6/isos/x86_64/" target="_blank" rel="noopener">CentOS6.9 x86_64</a>最小镜像。NMP(Nginx、MySQL、PHP)使用<a href="https://blog.linuxeye.cn/31.html" target="_blank" rel="noopener">部署脚本</a>安装。</p>
+<h2 id="安装操作系统"><a href="#安装操作系统" class="headerlink" title="安装操作系统"></a>安装操作系统</h2><p>虚拟机安装操作系统在此不作细述，需要注意两点，一是配置虚拟机网络为桥接方式，二是关闭虚拟机防火墙。</p>
+<div align="center"><img src="/images/network_config.jpg"></div>
+
+<ol>
+<li>虚拟机网络配置如上图。配置完成后，在虚拟机执行<code>service network restart</code>重启网卡</li>
+<li>关闭防火墙<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service iptables stop 		# 关闭命令</span><br><span class="line">chkconfig iptables off		# 永久关闭</span><br><span class="line">service iptables status	# 查看状态</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="在虚拟机安装软件"><a href="#在虚拟机安装软件" class="headerlink" title="在虚拟机安装软件"></a>在虚拟机安装软件</h2><p>创建两台虚拟机，这里取名为<code>nginx1</code>和<code>nginx2</code>，使用<a href="https://blog.linuxeye.cn/31.html" target="_blank" rel="noopener">部署脚本</a>为这两台虚拟机分别安装Nginx和PHP(后面搭建MySQL主从会再新建虚拟机，所以这里只安装必要的Nginx和PHP即可)。安装完成后，在物理机访问虚拟机IP地址，不出意外的话，页面会显示部署脚本的自定义内容。若出意外，不外乎两个原因，虚拟机网络连接方式和防火墙是否关闭，耐心解决一下就好了。</p>
+<p>为了直观显示，在两台虚拟机的<code>/data/wwwroot/default/</code>目录下先把全部文件删除，新建<code>index.html</code>文件并添加如下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;Nginx1(2)&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;This is Nginx 1(2).&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>html内容里的1和2表示虚拟机<code>nginx1</code>或<code>nginx2</code>(废话还是要扯一扯的)</p>
+<h2 id="物理机Nginx配置"><a href="#物理机Nginx配置" class="headerlink" title="物理机Nginx配置"></a>物理机Nginx配置</h2><p>接下来到关键时刻了，在物理机Nginx配置里新添加一个虚拟主机，这里取名为<code>proxy.conf</code>，配置内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">upstream my_server &#123;</span><br><span class="line">    server 192.168.30.102;</span><br><span class="line">    server 192.168.30.103;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  proxy.app;</span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://my_server/;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的配置必须添加在http节点下才生效。这段配置的大概意思是，把访问<code>proxy.app</code>的请求以轮询方式反向代理到IP地址为<code>192.168.30.102</code>和<code>192.168.30.103</code>服务器中，即那两台虚拟机。最后别忘了修改物理机的hosts和重启Nginx。</p>
+<p>在物理机访问<code>proxy.app</code>看下效果。</p>
+<div align="center"><img src="/images/proxy1.jpg"></div>
+
+<p>刷新</p>
+<div align="center"><img src="/images/proxy2.jpg"></div>
+
+
+
+
+
+
+
+
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/bring-high-performance-into-your-php-app/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/build-the-structure-on-a-computer-second-part/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

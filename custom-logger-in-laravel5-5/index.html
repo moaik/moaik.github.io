@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>在Laravel5.5自定义日志文件中记录SQL语句 | Moext</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Laravel," />
+  
+
+  <meta name="description" content="为什么这样搞？公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了这个帖子才渐渐有了些思路。因为线上运行的服务都配套做了Error Track(异">
+<meta name="keywords" content="Laravel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Laravel5.5自定义日志文件中记录SQL语句">
+<meta property="og:url" content="https://moext.github.io/custom-logger-in-laravel5-5/index.html">
+<meta property="og:site_name" content="Moext">
+<meta property="og:description" content="为什么这样搞？公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了这个帖子才渐渐有了些思路。因为线上运行的服务都配套做了Error Track(异">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-10T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Laravel5.5自定义日志文件中记录SQL语句">
+<meta name="twitter:description" content="为什么这样搞？公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了这个帖子才渐渐有了些思路。因为线上运行的服务都配套做了Error Track(异">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbe6" rel="stylesheet">
+
+
+  
+
+  
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+</head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">盒子</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">盒子</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            归档
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/categories/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tags/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么这样搞？"><span class="toc-text">为什么这样搞？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义日志文件"><span class="toc-text">自定义日志文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#监听SQL执行事件"><span class="toc-text">监听SQL执行事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#补充"><span class="toc-text">补充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第二次补充"><span class="toc-text">第二次补充</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-custom-logger-in-laravel5-5" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">在Laravel5.5自定义日志文件中记录SQL语句</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.09.05</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>moext</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/programming/">编程</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h2 id="为什么这样搞？"><a href="#为什么这样搞？" class="headerlink" title="为什么这样搞？"></a>为什么这样搞？</h2><p>公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了<a href="https://laravel-china.org/articles/5779/output-the-sql-statement-to-the-log-log-in-laravel#reply30802" target="_blank" rel="noopener">这个帖子</a>才渐渐有了些思路。因为线上运行的服务都配套做了<code>Error Track</code>(异常捕获)，原理是将每个接口返回的错误码全部记录到日志文件中，把日志文件按半小时分割，每隔半小时<code>Error Track</code>服务就会进行日志分析，若日志里存在错误码，则会发邮件和短信报警。现在有办法在日志文件里记录原生SQL了，接下来就该考虑如何把SQL记录到新的文件里从而不影响异常捕获程序正常运行。</p>
+<h2 id="自定义日志文件"><a href="#自定义日志文件" class="headerlink" title="自定义日志文件"></a>自定义日志文件</h2><p>最近刚理解了<code>trait</code>，所以这里试着用用，反正也不花钱。<br>在<code>app</code>目录下新建目录<code>Traits</code>，在<code>Traits</code>里新建文件<code>CustomLogger.php</code>，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace App\Traits;</span><br><span class="line">use Monolog\Logger;</span><br><span class="line">use Illuminate\Log\Writer;</span><br><span class="line">trait CustomLogger</span><br><span class="line">&#123;</span><br><span class="line">    private static $loggers = array();</span><br><span class="line">    public function getLogger($name, $path = null, $day = 30)</span><br><span class="line">    &#123;</span><br><span class="line">        if (null === $path) &#123;</span><br><span class="line">            $path = storage_path(&apos;logs/&apos; . $name . &apos;.log&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (!isset(self::$loggers[$name])) &#123;</span><br><span class="line">            self::$loggers[$name] = new Writer(new Logger($name));</span><br><span class="line">            self::$loggers[$name]-&gt;useDailyFiles($path, $day);</span><br><span class="line">        &#125;</span><br><span class="line">        $log = self::$loggers[$name];</span><br><span class="line">        return $log;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义这样一个自定义日志性状，支持自定义日志文件名称、日志保存路径及保留时长。哪里需要就可以记哪里了。用法见下文。</p>
+<h2 id="监听SQL执行事件"><a href="#监听SQL执行事件" class="headerlink" title="监听SQL执行事件"></a>监听SQL执行事件</h2><p>参照<a href="https://laravel.com/docs/5.5/database#listening-for-query-events" target="_blank" rel="noopener">文档</a>可知，在<code>AppServiceProvider.php</code>中的boot方法中添加如下代码即可监听。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DB::listen(function ($query) &#123;</span><br><span class="line">    // $query-&gt;sql</span><br><span class="line">    // $query-&gt;bindings</span><br><span class="line">    // $query-&gt;time</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>现在修改一下匿名方法，把监听到的SQL记录到自定义日志文件里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">use CustomLogger;    </span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = $this-&gt;getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function($query) use ($log) &#123;</span><br><span class="line">        $log-&gt;info($query-&gt;sql .&apos;[&apos;. $query-&gt;time .&apos;ms]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>stackoverflow上有个帖子说PHP中只有类、接口、方法和常量受命名空间影响，定义trait不需要命名空间，但试了下并不行。所以在<code>AppServiceProvider</code>文件里还需要<code>use App\Traits\CustomLogger;</code>。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>项目使用Laravel5.1开发，使用如上步骤报错。以下是5.1版本使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use CustomLogger;    </span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = $this-&gt;getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function ($sql, $bindings, $time) use ($log) &#123;</span><br><span class="line">        $tmp = str_replace(&apos;?&apos;, &apos;&quot;&apos;.&apos;%s&apos;.&apos;&quot;&apos;, $sql);</span><br><span class="line">        $sql = vsprintf($tmp, $bindings);</span><br><span class="line">        $log-&gt;info($sql .&apos;[execute_time=&apos;.$time.&apos;ms]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="第二次补充"><a href="#第二次补充" class="headerlink" title="第二次补充"></a>第二次补充</h2><p>目前修改后的项目已进入测试阶段，在测试环境查看日志文件里的SQL语句，一坨一坨的。为了以后能精确分析出那些执行时间长的SQL是请求哪些接口出现的，应该在每条SQL语句后标识一下接口名称。非常简单，使用Laravel的<code>Request</code>门面获取到uri即可。修改代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use Illuminate\Support\Facades\Request;</span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = LoggerLib::getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function ($sql, $bindings, $time) use ($log) &#123;</span><br><span class="line">        $tmp = str_replace(&apos;?&apos;, &apos;&quot;&apos;.&apos;%s&apos;.&apos;&quot;&apos;, $sql);</span><br><span class="line">        $sql = vsprintf($tmp, $bindings);</span><br><span class="line">        $log-&gt;info($sql .&apos;[execute_time=&apos;.$time.&apos;ms][uri=&apos;.Request::path().&apos;]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以通过<code>[execute_time=1.24ms][uri=login]</code>这两个标识来过滤日志。比如要查看登录接口执行时间是50毫秒的SQL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &apos;execute_time=50.*&apos; | grep &apos;uri=login&apos; illuminate.query-2017-09-08.log</span><br></pre></td></tr></table></figure>
+
+    
+  </div>
+</article>
+
+
+   
+  <div class="text-center donation">
+    <div class="inner-donation">
+      <span class="btn-donation">不用支持</span>
+      <div class="donation-body">
+        <div class="tip text-center">去掉样式就乱了</div>
+        <ul class="theme.donation.items.length">
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+          <li class="item">
+            <img src="/images/left.jpg" alt="">
+          </li>
+        
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/build-the-structure-on-a-computer-second-part/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/vue-element-ui-date-picker-format/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              归档
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/categories/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tags/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+
+
+
+    
+
+    
+	
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
