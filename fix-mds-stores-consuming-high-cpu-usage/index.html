@@ -7,26 +7,26 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Mac安装PHP扩展遇到的问题 | Moaik</title>
+  <title>解决MAC高CPU | Moaik</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   
-    <meta name="keywords" content="Mac OS," />
+    <meta name="keywords" content="MAC," />
   
 
-  <meta name="description" content="Mac升级系统后，在安装Redis扩展时出现如下错误： 12Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted">
-<meta name="keywords" content="Mac OS">
+  <meta name="description" content="昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，mds_stores这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。 解决办法： - 重启(如果重启奏效，那就停止阅读吧) - 禁用`Spotlight`(打开终端，输入`sudo mdutil -a -i off`) 可以使用紫帽子替代Spotlight 参考文章">
+<meta name="keywords" content="MAC">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mac安装PHP扩展遇到的问题">
-<meta property="og:url" content="https://moaik.github.io/mac-high-sierra-os-install-php-extension/index.html">
+<meta property="og:title" content="解决MAC高CPU">
+<meta property="og:url" content="https://moaik.github.io/fix-mds-stores-consuming-high-cpu-usage/index.html">
 <meta property="og:site_name" content="Moaik">
-<meta property="og:description" content="Mac升级系统后，在安装Redis扩展时出现如下错误： 12Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted">
+<meta property="og:description" content="昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，mds_stores这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。 解决办法： - 重启(如果重启奏效，那就停止阅读吧) - 禁用`Spotlight`(打开终端，输入`sudo mdutil -a -i off`) 可以使用紫帽子替代Spotlight 参考文章">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-15T03:10:56.960Z">
+<meta property="og:updated_time" content="2018-10-18T02:22:19.618Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mac安装PHP扩展遇到的问题">
-<meta name="twitter:description" content="Mac升级系统后，在安装Redis扩展时出现如下错误： 12Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted">
+<meta name="twitter:title" content="解决MAC高CPU">
+<meta name="twitter:description" content="昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，mds_stores这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。 解决办法： - 重启(如果重启奏效，那就停止阅读吧) - 禁用`Spotlight`(打开终端，输入`sudo mdutil -a -i off`) 可以使用紫帽子替代Spotlight 参考文章">
 
   
 
@@ -140,14 +140,14 @@
 
 
 <div class="content content-post CENTER">
-   <article id="post-mac-high-sierra-os-install-php-extension" class="article article-type-post" itemprop="blogPost">
+   <article id="post-fix-mds-stores-consuming-high-cpu-usage" class="article article-type-post" itemprop="blogPost">
   <header class="article-header">
-    <h1 class="post-title">Mac安装PHP扩展遇到的问题</h1>
+    <h1 class="post-title">解决MAC高CPU</h1>
 
     <div class="article-meta">
       <span>
         <i class="icon-calendar"></i>
-        <span>2018.06.14</span>
+        <span>2018.10.18</span>
       </span>
 
       
@@ -158,6 +158,11 @@
       
 
       
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/操作系统/">操作系统</a>
+  </span>
+
 
 
       
@@ -177,14 +182,12 @@
 
   <div class="article-content">
     
-      <p>Mac升级系统后，在安装Redis扩展时出现如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/</span><br><span class="line">cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted</span><br></pre></td></tr></table></figure>
-<p>以为遇到了权限问题，没想到加上<code>sudo</code>报错依旧。在网上查了一番，更多的解释是Mac系统升级默认开启了SIP，给出的解决办法多数是<code>重启电脑</code>，<code>按Command+R</code>，<code>输入csrutil disable关闭SIP</code>。总觉得这个办法不妥，于是耐着性子继续浏览其它解决办法。解决完之后，在这记录一下。</p>
-<p>先自己建一个放扩展的目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/lib/php/extensions</span><br></pre></td></tr></table></figure></p>
-<p>安装的时候指定到这个目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo make EXTENSION_DIR=&apos;/usr/local/lib/php/extensions&apos; install</span><br></pre></td></tr></table></figure>
-<p>PHP配置文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extension=/usr/local/lib/php/extensions/xxx.so</span><br></pre></td></tr></table></figure>
+      <p>昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，<code>mds_stores</code>这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。</p>
+<p>解决办法：</p>
+<pre><code>- 重启(如果重启奏效，那就停止阅读吧)
+- 禁用`Spotlight`(打开终端，输入`sudo mdutil -a -i off`)
+</code></pre><p>可以使用<a href="https://www.alfredapp.com/" target="_blank" rel="noopener">紫帽子</a>替代<code>Spotlight</code></p>
+<p><a href="https://macmetric.com/fix-mds_stores-consuming-high-cpu-usage/" target="_blank" rel="noopener">参考文章</a></p>
 
     
   </div>
@@ -215,10 +218,10 @@
 
    
   <div class="box-prev-next clearfix">
-    <a class="show pull-left" href="/mysql-foreign-key-index/">
+    <a class="show pull-left" href="/mac-high-sierra-os-install-php-extension/">
         <i class="icon icon-angle-left"></i>
     </a>
-    <a class="show pull-right" href="/fix-mds-stores-consuming-high-cpu-usage/">
+    <a class="hide pull-right" href="/">
         <i class="icon icon-angle-right"></i>
     </a>
   </div>
