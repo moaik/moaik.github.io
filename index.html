@@ -1,6 +1,474 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>皮格鲁斯</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">皮格鲁斯</h1><a id="logo" href="/.">皮格鲁斯</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title"><a href="/fix-mds-stores-consuming-high-cpu-usage/">解决MAC高CPU</a></h1><div class="post-meta">2018-10-18</div><div class="post-content"><p>昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，<code>mds_stores</code>这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<link rel="alternate" href="/default" title="皮格鲁斯"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.10.2">
+<link rel="canonical" href="https://pygroos.github.io/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.10.2">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true};
+</script>
+
+    <title>皮格鲁斯</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">皮格鲁斯</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/archives/">
+        <li class="mobile-menu-item">归档
+          </li>
+      </a><a href="/tags">
+        <li class="mobile-menu-item">标签
+          </li>
+      </a><a href="/categories">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">皮格鲁斯</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            归档
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            标签
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            分类
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><section id="posts" class="posts"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/fix-mds-stores-consuming-high-cpu-usage/">解决MAC高CPU</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-10-18
+        </span><span class="post-category">
+            <a href="/categories/操作系统/">操作系统</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>昨天下班后，习惯性锁屏合上电脑。今早打开电脑，发现遇到问题自动关机了。重新开机后，发现CPU一直居高不下。查看进程，<code>mds_stores</code>这个进程使用CPU达到百分之九十多。重启电脑，问题依旧。</p>
 <p>解决办法：</p>
 <ol>
-<li>重启(如果重启奏效，那就停止阅读吧)</li></ol></div><p class="readmore"><a href="/fix-mds-stores-consuming-high-cpu-usage/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/mac-high-sierra-os-install-php-extension/">Mac安装PHP扩展遇到的问题</a></h1><div class="post-meta">2018-06-14</div><div class="post-content"><p>Mac升级系统后，在安装Redis扩展时出现如下错误：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/</span><br><span class="line">cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted</span><br></pre></td></tr></table></figure></div><p class="readmore"><a href="/mac-high-sierra-os-install-php-extension/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/mysql-foreign-key-index/">MySQL外键索引</a></h1><div class="post-meta">2018-04-27</div><div class="post-content"><p>先建两个表，文章表(articles)和评论表(comments)。它们之间的关系是一对多，即一篇文章有多条评论。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `articles` (</span><br><span class="line">  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `title` varchar(255) NOT NULL DEFAULT &apos;&apos;,</span><br><span class="line">  `author` varchar(255) NOT NULL DEFAULT &apos;&apos;,</span><br><span class="line">  `content` text NOT NULL,</span><br><span class="line">  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure></p></div><p class="readmore"><a href="/mysql-foreign-key-index/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/mac-sublime-handle-column/">Sublime操作列</a></h1><div class="post-meta">2018-04-23</div><div class="post-content"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Command + a  全选</span><br><span class="line"></span><br><span class="line">Command + l  在每一列后面显示光标</span><br><span class="line"></span><br><span class="line">Command + j	 变成一行</span><br></pre></td></tr></table></figure></div><p class="readmore"><a href="/mac-sublime-handle-column/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/vue-element-ui-date-picker-format/">ElementUI日期组件格式化问题</a></h1><div class="post-meta">2017-11-30</div><div class="post-content"><p>最近做一个CMS管理系统，采用前后端分离模式。由于前端开发人员排不开期，所以只好我们PHP自己写页面。对于我这样一个连Jqery都不会写的初级码农，突然要求用vue写页面，着实困难不小。一脸懵逼…两脸懵逼…虽然写起来磕磕绊绊，但最后还是如期完工了。至此，我总结了两点，先说重要的。新接触任何一个事物，心态要摆正，一定不能产生抵触心理。再然后是充分理解新事物的核心理念，vue的核心是数据双向绑定。</p></div><p class="readmore"><a href="/vue-element-ui-date-picker-format/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/custom-logger-in-laravel5-5/">在Laravel5.5自定义日志文件中记录SQL语句</a></h1><div class="post-meta">2017-09-05</div><div class="post-content"><h2 id="为什么这样搞？"><a href="#为什么这样搞？" class="headerlink" title="为什么这样搞？"></a>为什么这样搞？</h2><p>公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了<a href="https://laravel-china.org/articles/5779/output-the-sql-statement-to-the-log-log-in-laravel#reply30802" target="_blank" rel="noopener">这个帖子</a>才渐渐有了些思路。因为线上运行的服务都配套做了<code>Error Track</code>(异常捕获)，原理是将每个接口返回的错误码全部记录到日志文件中，把日志文件按半小时分割，每隔半小时<code>Error Track</code>服务就会进行日志分析，若日志里存在错误码，则会发邮件和短信报警。现在有办法在日志文件里记录原生SQL了，接下来就该考虑如何把SQL记录到新的文件里从而不影响异常捕获程序正常运行。</p></div><p class="readmore"><a href="/custom-logger-in-laravel5-5/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/build-the-structure-on-a-computer-second-part/">一台电脑玩玩架构 - MySQL主从复制</a></h1><div class="post-meta">2017-08-30</div><div class="post-content"><h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>沿用<a href="https://pygroos.github.io/build-the-structure-on-a-computer-first-part/">上一篇</a>操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。</p></div><p class="readmore"><a href="/build-the-structure-on-a-computer-second-part/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/build-the-structure-on-a-computer-first-part/">一台电脑玩玩架构 - Nginx反向代理</a></h1><div class="post-meta">2017-08-28</div><div class="post-content"><h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用<a href="https://www.virtualbox.org/wiki/Downloads" target="_blank" rel="noopener">virtualbox</a>，操作系统使用<a href="http://isoredirect.centos.org/centos/6/isos/x86_64/" target="_blank" rel="noopener">CentOS6.9 x86_64</a>最小镜像。NMP(Nginx、MySQL、PHP)使用<a href="https://blog.linuxeye.cn/31.html" target="_blank" rel="noopener">部署脚本</a>安装。</p></div><p class="readmore"><a href="/build-the-structure-on-a-computer-first-part/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/bring-high-performance-into-your-php-app/">(译)提升PHP程序性能</a></h1><div class="post-meta">2017-06-20</div><div class="post-content"><blockquote>
-<p>这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。</p></blockquote></div><p class="readmore"><a href="/bring-high-performance-into-your-php-app/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/the-server-login-do-not-use-password/">服务器免密码登录</a></h1><div class="post-meta">2017-05-25</div><div class="post-content"><h2 id="本机配置"><a href="#本机配置" class="headerlink" title="本机配置"></a>本机配置</h2><p>1.生成<code>ssh key</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里</span><br></pre></td></tr></table></figure></p></div><p class="readmore"><a href="/the-server-login-do-not-use-password/">阅读全文</a></p></div><nav class="page-navigator"><span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页</a></nav></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="https://pygroos.github.io"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/操作系统/">操作系统</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构/">架构</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Laravel/" style="font-size: 15px;">Laravel</a> <a href="/tags/MAC/" style="font-size: 15px;">MAC</a> <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/Sublime/" style="font-size: 15px;">Sublime</a> <a href="/tags/NoSQL/" style="font-size: 15px;">NoSQL</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Vue/" style="font-size: 15px;">Vue</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/fix-mds-stores-consuming-high-cpu-usage/">解决MAC高CPU</a></li><li class="post-list-item"><a class="post-list-link" href="/mac-high-sierra-os-install-php-extension/">Mac安装PHP扩展遇到的问题</a></li><li class="post-list-item"><a class="post-list-link" href="/mysql-foreign-key-index/">MySQL外键索引</a></li><li class="post-list-item"><a class="post-list-link" href="/mac-sublime-handle-column/">Sublime操作列</a></li><li class="post-list-item"><a class="post-list-link" href="/vue-element-ui-date-picker-format/">ElementUI日期组件格式化问题</a></li><li class="post-list-item"><a class="post-list-link" href="/custom-logger-in-laravel5-5/">在Laravel5.5自定义日志文件中记录SQL语句</a></li><li class="post-list-item"><a class="post-list-link" href="/build-the-structure-on-a-computer-second-part/">一台电脑玩玩架构 - MySQL主从复制</a></li><li class="post-list-item"><a class="post-list-link" href="/build-the-structure-on-a-computer-first-part/">一台电脑玩玩架构 - Nginx反向代理</a></li><li class="post-list-item"><a class="post-list-link" href="/bring-high-performance-into-your-php-app/">(译)提升PHP程序性能</a></li><li class="post-list-item"><a class="post-list-link" href="/the-server-login-do-not-use-password/">服务器免密码登录</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">皮格鲁斯.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+<li>重启(如果重启奏效，那就停止阅读吧)</li>
+<li>禁用<code>Spotlight</code>(打开终端，输入<code>sudo mdutil -a -i off</code>)</li>
+</ol>
+<p>可以使用<a href="https://www.alfredapp.com/" target="_blank" rel="noopener">紫帽子</a>替代<code>Spotlight</code></p>
+<p><a href="https://macmetric.com/fix-mds_stores-consuming-high-cpu-usage/" target="_blank" rel="noopener">参考文章</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/mac-high-sierra-os-install-php-extension/">Mac安装PHP扩展遇到的问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-06-14
+        </span></div>
+    </header>
+
+    <div class="post-content"><p>Mac升级系统后，在安装Redis扩展时出现如下错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Installing shared extensions: /usr/lib/php/extensions/no-debug-non-zts-20121212/</span><br><span class="line">cp: /usr/lib/php/extensions/no-debug-non-zts-20121212/#INST@826#: Operation not permitted</span><br></pre></td></tr></table></figure>
+<p>以为遇到了权限问题，没想到加上<code>sudo</code>报错依旧。在网上查了一番，更多的解释是Mac系统升级默认开启了SIP，给出的解决办法多数是<code>重启电脑</code>，<code>按Command+R</code>，<code>输入csrutil disable关闭SIP</code>。总觉得这个办法不妥，于是耐着性子继续浏览其它解决办法。解决完之后，在这记录一下。</p>
+<p>先自己建一个放扩展的目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /usr/local/lib/php/extensions</span><br></pre></td></tr></table></figure></p>
+<p>安装的时候指定到这个目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo make EXTENSION_DIR=&apos;/usr/local/lib/php/extensions&apos; install</span><br></pre></td></tr></table></figure>
+<p>PHP配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">extension=/usr/local/lib/php/extensions/xxx.so</span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/mysql-foreign-key-index/">MySQL外键索引</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-27
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>先建两个表，文章表(articles)和评论表(comments)。它们之间的关系是一对多，即一篇文章有多条评论。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `articles` (</span><br><span class="line">  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `title` varchar(255) NOT NULL DEFAULT &apos;&apos;,</span><br><span class="line">  `author` varchar(255) NOT NULL DEFAULT &apos;&apos;,</span><br><span class="line">  `content` text NOT NULL,</span><br><span class="line">  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `comments` (</span><br><span class="line">  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `art_id` int(11) unsigned NOT NULL,</span><br><span class="line">  `content` varchar(255) NOT NULL DEFAULT &apos;&apos;,</span><br><span class="line">  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,</span><br><span class="line">  PRIMARY KEY (`id`),</span><br><span class="line">  KEY `art_id` (`art_id`),</span><br><span class="line">  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`art_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<p>通过对比这两张表发现都是使用<code>InnoDB</code>引擎，因为<code>MyISAM</code>不支持外键。我们给<code>comments</code>表设置了外键<code>art_id</code>，对应<code>articles</code>表的主键，这两个字段类型必须保持一致，即都是<code>int(11) unsigned</code>。</p>
+<p>接下来分别插入数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `articles` (`id`, `title`, `author`, `content`, `created_at`, `updated_at`)</span><br><span class="line">VALUES</span><br><span class="line">	(9, &apos;第一章&apos;, &apos;jack&apos;, &apos;A long long time ago...&apos;, &apos;2018-04-27 20:27:15&apos;, &apos;2018-04-27 20:56:32&apos;);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO `comments` (`id`, `art_id`, `content`, `created_at`, `updated_at`)</span><br><span class="line">VALUES</span><br><span class="line">	(1, 9, &apos;And then?&apos;, &apos;2018-04-27 20:56:20&apos;, &apos;2018-04-27 20:56:20&apos;);</span><br></pre></td></tr></table></figure>
+<p>可以看到此时评论表的<code>art_id</code>和文章表的<code>id</code>都是9。</p>
+<p>然后我们试着更新一下文章表的主键<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update articles set id = 1 where id = 9;</span><br></pre></td></tr></table></figure></p>
+<p>执行成功后，评论表里的<code>art_id</code>就变成1了。这就是外键，更多应用在级联约束的场景中，省去代码操作，MySQL直接解决了关联问题。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/mac-sublime-handle-column/">Sublime操作列</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2018-04-23
+        </span><span class="post-category">
+            <a href="/categories/工具/">工具</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Command + a  全选</span><br><span class="line"></span><br><span class="line">Command + l  在每一列后面显示光标</span><br><span class="line"></span><br><span class="line">Command + j	 变成一行</span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/vue-element-ui-date-picker-format/">ElementUI日期组件格式化问题</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-11-30
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><p>最近做一个CMS管理系统，采用前后端分离模式。由于前端开发人员排不开期，所以只好我们PHP自己写页面。对于我这样一个连Jqery都不会写的初级码农，突然要求用vue写页面，着实困难不小。一脸懵逼…两脸懵逼…虽然写起来磕磕绊绊，但最后还是如期完工了。至此，我总结了两点，先说重要的。新接触任何一个事物，心态要摆正，一定不能产生抵触心理。再然后是充分理解新事物的核心理念，vue的核心是数据双向绑定。</p>
+<p>到最后，功能虽然实现了，但小问题还有很多。这里就说说ElementUI日期组件的的坑以及解决方法。关于问题描述，已经有人提出<a href="https://github.com/ElemeFE/element/issues/1841" target="_blank" rel="noopener">issue</a>，详情可以参考这个<a href="https://github.com/ElemeFE/element/issues/1841" target="_blank" rel="noopener">issue</a>。</p>
+<p>这里再描述下问题是怎么产生的和如何解决的。Date对象使用UTC时间，比北京时间慢8小时。ElementUI的日期组件会在展示的时候自动将UTC时间转成本地时间，但model仍是UTC时间。可以脑补一副撕逼画面：运营找开发说，我特么的明明选择了这个活动的上线时间是2018年1月1日08时00分00秒，现在都特么中午了，怎么还没自动上线？然后，后端开发查查数据库发现这个活动的实际开始时间是2018年1月1日16时00分00秒。后端找前端问，是不是你给我传错时间了……</p>
+<p>现在问题就出在这慢了的8小时。如果前端是个可爱的小妹妹，她会求后端开发在保存到数据库之前处理一下她传过来的这个时间。后端开发乐呵呵地去改了。如果前端是个满脸胡子的大老爷们儿……老爷们儿心里说一句妈卖批，然后自己改。满脸胡子的前端一边写如下代码一边心里说，多大点事儿啊！老子分分钟搞定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">let date = this.createDate;</span><br><span class="line">date = [</span><br><span class="line">  [date.getFullYear(), date.getMonth() + 1, date.getDate()].join(&apos;-&apos;),</span><br><span class="line">  [date.getHours(), date.getMinutes(), date.getSeconds()].join(&apos;:&apos;)</span><br><span class="line">].join(&apos; &apos;).replace(/(?=\b\d\b)/g, &apos;0&apos;);</span><br><span class="line">this.createDate = date;</span><br></pre></td></tr></table></figure>
+<p>上边代码能把UTC时间处理成北京时间，但也把时间对象变成了时间字符串。看起来没毛病，但其实有毛病，在vue里就会有毛病。我们假设<code>this.createDate</code>是日期控件绑定的值，起初它是一个对象，在传给后端之前做了时区转换，这个绑定的值也从对象变成了字符串。双向绑定、双向绑定、双向绑定，所以转换之后的<code>this.createDate</code>已经不是对象了。当再次提交表单就会提示找不到<code>getFullYear</code>这个方法。</p>
+<p>解决这个问题其实非常简单，我们不要直接改变绑定的这个日期控件的值。在传给后端之前，新定义一个变量<code>let dateTemp</code>，把双向绑定的<code>this.createDate</code>赋值给新定义变量。然后转换<code>dateTemp</code>为正确时区。</p>
+<p>有添加的地方就有编辑，所以在获取数据之后先要把时间字符串转换成对象，然后再赋值给绑定的<code>this.createDate</code>。即:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.createDate = new Date(Date.parse(timestamp.replace(/-/g, &quot;/&quot;)))</span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/custom-logger-in-laravel5-5/">在Laravel5.5自定义日志文件中记录SQL语句</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-09-05
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h2 id="为什么这样搞？"><a href="#为什么这样搞？" class="headerlink" title="为什么这样搞？"></a>为什么这样搞？</h2><p>公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了<a href="https://laravel-china.org/articles/5779/output-the-sql-statement-to-the-log-log-in-laravel#reply30802" target="_blank" rel="noopener">这个帖子</a>才渐渐有了些思路。因为线上运行的服务都配套做了<code>Error Track</code>(异常捕获)，原理是将每个接口返回的错误码全部记录到日志文件中，把日志文件按半小时分割，每隔半小时<code>Error Track</code>服务就会进行日志分析，若日志里存在错误码，则会发邮件和短信报警。现在有办法在日志文件里记录原生SQL了，接下来就该考虑如何把SQL记录到新的文件里从而不影响异常捕获程序正常运行。</p>
+<h2 id="自定义日志文件"><a href="#自定义日志文件" class="headerlink" title="自定义日志文件"></a>自定义日志文件</h2><p>最近刚理解了<code>trait</code>，所以这里试着用用，反正也不花钱。<br>在<code>app</code>目录下新建目录<code>Traits</code>，在<code>Traits</code>里新建文件<code>CustomLogger.php</code>，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace App\Traits;</span><br><span class="line">use Monolog\Logger;</span><br><span class="line">use Illuminate\Log\Writer;</span><br><span class="line">trait CustomLogger</span><br><span class="line">&#123;</span><br><span class="line">    private static $loggers = array();</span><br><span class="line">    public function getLogger($name, $path = null, $day = 30)</span><br><span class="line">    &#123;</span><br><span class="line">        if (null === $path) &#123;</span><br><span class="line">            $path = storage_path(&apos;logs/&apos; . $name . &apos;.log&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (!isset(self::$loggers[$name])) &#123;</span><br><span class="line">            self::$loggers[$name] = new Writer(new Logger($name));</span><br><span class="line">            self::$loggers[$name]-&gt;useDailyFiles($path, $day);</span><br><span class="line">        &#125;</span><br><span class="line">        $log = self::$loggers[$name];</span><br><span class="line">        return $log;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定义这样一个自定义日志性状，支持自定义日志文件名称、日志保存路径及保留时长。哪里需要就可以记哪里了。用法见下文。</p>
+<h2 id="监听SQL执行事件"><a href="#监听SQL执行事件" class="headerlink" title="监听SQL执行事件"></a>监听SQL执行事件</h2><p>参照<a href="https://laravel.com/docs/5.5/database#listening-for-query-events" target="_blank" rel="noopener">文档</a>可知，在<code>AppServiceProvider.php</code>中的boot方法中添加如下代码即可监听。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DB::listen(function ($query) &#123;</span><br><span class="line">    // $query-&gt;sql</span><br><span class="line">    // $query-&gt;bindings</span><br><span class="line">    // $query-&gt;time</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>现在修改一下匿名方法，把监听到的SQL记录到自定义日志文件里。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">use CustomLogger;    </span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = $this-&gt;getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function($query) use ($log) &#123;</span><br><span class="line">        $log-&gt;info($query-&gt;sql .&apos;[&apos;. $query-&gt;time .&apos;ms]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>stackoverflow上有个帖子说PHP中只有类、接口、方法和常量受命名空间影响，定义trait不需要命名空间，但试了下并不行。所以在<code>AppServiceProvider</code>文件里还需要<code>use App\Traits\CustomLogger;</code>。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>项目使用Laravel5.1开发，使用如上步骤报错。以下是5.1版本使用方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use CustomLogger;    </span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = $this-&gt;getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function ($sql, $bindings, $time) use ($log) &#123;</span><br><span class="line">        $tmp = str_replace(&apos;?&apos;, &apos;&quot;&apos;.&apos;%s&apos;.&apos;&quot;&apos;, $sql);</span><br><span class="line">        $sql = vsprintf($tmp, $bindings);</span><br><span class="line">        $log-&gt;info($sql .&apos;[execute_time=&apos;.$time.&apos;ms]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="第二次补充"><a href="#第二次补充" class="headerlink" title="第二次补充"></a>第二次补充</h2><p>目前修改后的项目已进入测试阶段，在测试环境查看日志文件里的SQL语句，一坨一坨的。为了以后能精确分析出那些执行时间长的SQL是请求哪些接口出现的，应该在每条SQL语句后标识一下接口名称。非常简单，使用Laravel的<code>Request</code>门面获取到uri即可。修改代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use Illuminate\Support\Facades\Request;</span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = LoggerLib::getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function ($sql, $bindings, $time) use ($log) &#123;</span><br><span class="line">        $tmp = str_replace(&apos;?&apos;, &apos;&quot;&apos;.&apos;%s&apos;.&apos;&quot;&apos;, $sql);</span><br><span class="line">        $sql = vsprintf($tmp, $bindings);</span><br><span class="line">        $log-&gt;info($sql .&apos;[execute_time=&apos;.$time.&apos;ms][uri=&apos;.Request::path().&apos;]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以通过<code>[execute_time=1.24ms][uri=login]</code>这两个标识来过滤日志。比如要查看登录接口执行时间是50毫秒的SQL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &apos;execute_time=50.*&apos; | grep &apos;uri=login&apos; illuminate.query-2017-09-08.log</span><br></pre></td></tr></table></figure>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/build-the-structure-on-a-computer-second-part/">一台电脑玩玩架构 - MySQL主从复制</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-08-30
+        </span><span class="post-category">
+            <a href="/categories/架构/">架构</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>沿用<a href="https://pygroos.github.io/build-the-structure-on-a-computer-first-part/">上一篇</a>操作系统及环境软件的安装方式，新建两个虚拟机，分别取名为Master、Slave并安装相同版本的MySQL数据库。</p>
+<h2 id="物理机连接MySQL"><a href="#物理机连接MySQL" class="headerlink" title="物理机连接MySQL"></a>物理机连接MySQL</h2><p>安装完成后先为物理机添加远程访问权限。首先在Master虚拟机登录MySQL，输入命令<code>use mysql</code>切换到mysql库。然后执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT ALL PRIVILEGES ON *.* TO &apos;root&apos;@&apos;物理机IP&apos; IDENTIFIED BY &apos;root账户密码&apos; WITH GRANT OPTION;</span><br></pre></td></tr></table></figure>
+<p>执行如下命令使授权生效：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<p>操作完成后，若无法连接，再次确认防火墙是否关闭或查看<code>my.cnf</code>配置文件中<code>bind-address</code>的值是否为<code>0.0.0.0</code>。</p>
+<p>在Slave虚拟机执行上述步骤。</p>
+<h2 id="MySQL主从配置"><a href="#MySQL主从配置" class="headerlink" title="MySQL主从配置"></a>MySQL主从配置</h2><h3 id="Mastermy-cnf配置"><a href="#Mastermy-cnf配置" class="headerlink" title="Mastermy.cnf配置"></a>Master<code>my.cnf</code>配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">设置server_id，一般设置为IP,注意要唯一</span><br><span class="line">server_id = 1 </span><br><span class="line">复制过滤：也就是指定哪个数据库不用同步（mysql库一般不同步）</span><br><span class="line">binlog-ignore-db = mysql  </span><br><span class="line">开启二进制日志功能，以备Slave作为其它Slave的Master时使用</span><br><span class="line">log-bin = edu-mysql-slave1-bin  </span><br><span class="line">为每个session 分配的内存，在事务过程中用来存储二进制日志的缓存</span><br><span class="line">binlog_cache_size = 1M  </span><br><span class="line">主从复制的格式（mixed,statement,row，默认格式是statement）</span><br><span class="line">binlog_format = mixed  </span><br><span class="line">二进制日志自动删除/过期的天数。默认值为0，表示不自动删除。</span><br><span class="line">expire_logs_days = 7  </span><br><span class="line">跳过主从复制中遇到的所有错误或指定类型的错误，避免slave端复制中断。</span><br><span class="line">如：1062错误是指一些主键重复，1032错误是因为主从数据库数据不一致</span><br><span class="line">slave_skip_errors = 1062  </span><br><span class="line">log_slave_updates表示slave将复制事件写进自己的二进制日志</span><br><span class="line">log_slave_updates=1  </span><br><span class="line">防止改变数据(除了特殊的线程)</span><br><span class="line">read_only=1</span><br></pre></td></tr></table></figure>
+<h3 id="Slavemy-cnf配置"><a href="#Slavemy-cnf配置" class="headerlink" title="Slavemy.cnf配置"></a>Slave<code>my.cnf</code>配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">log_bin = mysql-bin</span><br><span class="line">server_id = 2</span><br><span class="line">relay_log = mysql-relay-bin</span><br><span class="line">log_slave_updates = 1</span><br><span class="line">read_only = 1</span><br></pre></td></tr></table></figure>
+<p>如果Slave不是作为其它从库的主库，则没必要开启二进制日志，只需开启<code>relay_log</code>中继日志即可。</p>
+<h3 id="创建复制账号"><a href="#创建复制账号" class="headerlink" title="创建复制账号"></a>创建复制账号</h3><p>执行如下命令，在Master库中建立用于Slave连接的账户和密码并授权连接：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT REPLICATION SLAVE,RELOAD,SUPER ON *.* TO slave@&apos;Slave机IP&apos; IDENTIFIED BY &apos;1234&apos;;</span><br></pre></td></tr></table></figure>
+<p>执行如下命令使授权生效：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+<h3 id="查询Master状态"><a href="#查询Master状态" class="headerlink" title="查询Master状态"></a>查询Master状态</h3><p>执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show master status;</span><br></pre></td></tr></table></figure>
+<p>记录下返回结果的File列和Position列的值。</p>
+<h3 id="在从库中设置主库信息"><a href="#在从库中设置主库信息" class="headerlink" title="在从库中设置主库信息"></a>在从库中设置主库信息</h3><p>执行如下命令设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CHANGE MASTER TO MASTER_HOST=&apos;Master机IP&apos;, MASTER_USER=&apos;slave&apos;, MASTER_PASSWORD=&apos;1234&apos;, MASTER_LOG_FILE=&apos;mysql-bin.000001&apos;, MASTER_LOG_POS=154;</span><br></pre></td></tr></table></figure>
+<p><code>MASTER_LOG_FILE</code>和<code>MASTER_LOG_POS</code>的值设为主库中查询到的<code>File</code>和<code>Position</code>的值。</p>
+<h2 id="开始复制"><a href="#开始复制" class="headerlink" title="开始复制"></a>开始复制</h2><p>在从库中执行命令<code>start slave;</code>启用复制。运行<code>show slave status\G;</code>查看输出结果：</p>
+<div align="center"><img src="/images/slave_status.jpg"></div>
+
+<p><code>Slave_IO_Running</code>与<code>Slave_SQL_Running</code>的值都为<code>Yse</code>时，说明Slave的I/O和SQL线程都开始了，当主库二进制日志文件发生改变时，从库会先把二进制日志文件拷贝到它的中继日志里，从库重做中继日志里的事件，将更新反映到它自己的数据库。</p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>在Master和Slave新建<code>test</code>数据库<code>user</code>数据表，必须保持库和表一致。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create database test;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `users` (</span><br><span class="line">  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `username` varchar(255) DEFAULT NULL,</span><br><span class="line">  `password` varchar(255) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</span><br></pre></td></tr></table></figure>
+<p>在主库插入一条数据，在从库查看是否同步。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">insert into users (username, password) values (&apos;张三&apos;, &apos;123456&apos;);</span><br></pre></td></tr></table></figure>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>在上次验证的时候，先在Master建立了数据库，以为Slave随后会同步，然而并没有。在Slave<code>show slave status;</code>查看从库状态，报错了(具体记不清楚，现在无法复现)。所以想当然的认为，在保持数据同步之前，主从数据库必须具有相同的库和表才行。今天仔细翻看了MySQL文档，了解到二进制日志复制数据共有三种方式，一是基于SQL语句，二是基于行改变，最后是前两者结合。MySQL默认使用第一种方式，既然是基于语句的方式复制数据，那么当在主库上创建了数据库，肯定会将SQL记录到二进制日志中。从库没道理不同步的。于是在Master新建库新建表，在Slave查看，果然同步了。至于那个报错，有机会出现再探究一下原因。</p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/build-the-structure-on-a-computer-first-part/">一台电脑玩玩架构 - Nginx反向代理</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-08-28
+        </span><span class="post-category">
+            <a href="/categories/架构/">架构</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>物理机是公司配置的MBP(i5处理器 8G内存)，目前同时运行5台虚拟机速度还算流畅。虚拟机使用<a href="https://www.virtualbox.org/wiki/Downloads" target="_blank" rel="noopener">virtualbox</a>，操作系统使用<a href="http://isoredirect.centos.org/centos/6/isos/x86_64/" target="_blank" rel="noopener">CentOS6.9 x86_64</a>最小镜像。NMP(Nginx、MySQL、PHP)使用<a href="https://blog.linuxeye.cn/31.html" target="_blank" rel="noopener">部署脚本</a>安装。</p>
+<h2 id="安装操作系统"><a href="#安装操作系统" class="headerlink" title="安装操作系统"></a>安装操作系统</h2><p>虚拟机安装操作系统在此不作细述，需要注意两点，一是配置虚拟机网络为桥接方式，二是关闭虚拟机防火墙。</p>
+<div align="center"><img src="/images/network_config.jpg"></div>
+
+<ol>
+<li>虚拟机网络配置如上图。配置完成后，在虚拟机执行<code>service network restart</code>重启网卡</li>
+<li>关闭防火墙<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service iptables stop 		# 关闭命令</span><br><span class="line">chkconfig iptables off		# 永久关闭</span><br><span class="line">service iptables status	# 查看状态</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="在虚拟机安装软件"><a href="#在虚拟机安装软件" class="headerlink" title="在虚拟机安装软件"></a>在虚拟机安装软件</h2><p>创建两台虚拟机，这里取名为<code>nginx1</code>和<code>nginx2</code>，使用<a href="https://blog.linuxeye.cn/31.html" target="_blank" rel="noopener">部署脚本</a>为这两台虚拟机分别安装Nginx和PHP(后面搭建MySQL主从会再新建虚拟机，所以这里只安装必要的Nginx和PHP即可)。安装完成后，在物理机访问虚拟机IP地址，不出意外的话，页面会显示部署脚本的自定义内容。若出意外，不外乎两个原因，虚拟机网络连接方式和防火墙是否关闭，耐心解决一下就好了。</p>
+<p>为了直观显示，在两台虚拟机的<code>/data/wwwroot/default/</code>目录下先把全部文件删除，新建<code>index.html</code>文件并添加如下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;Nginx1(2)&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;This is Nginx 1(2).&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>html内容里的1和2表示虚拟机<code>nginx1</code>或<code>nginx2</code>(废话还是要扯一扯的)</p>
+<h2 id="物理机Nginx配置"><a href="#物理机Nginx配置" class="headerlink" title="物理机Nginx配置"></a>物理机Nginx配置</h2><p>接下来到关键时刻了，在物理机Nginx配置里新添加一个虚拟主机，这里取名为<code>proxy.conf</code>，配置内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">upstream my_server &#123;</span><br><span class="line">    server 192.168.30.102;</span><br><span class="line">    server 192.168.30.103;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  proxy.app;</span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://my_server/;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的配置必须添加在http节点下才生效。这段配置的大概意思是，把访问<code>proxy.app</code>的请求以轮询方式反向代理到IP地址为<code>192.168.30.102</code>和<code>192.168.30.103</code>服务器中，即那两台虚拟机。最后别忘了修改物理机的hosts和重启Nginx。</p>
+<p>在物理机访问<code>proxy.app</code>看下效果。</p>
+<div align="center"><img src="/images/proxy1.jpg"></div>
+
+<p>刷新</p>
+<div align="center"><img src="/images/proxy2.jpg"></div>
+
+
+
+
+
+
+
+
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/bring-high-performance-into-your-php-app/">(译)提升PHP程序性能</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-06-20
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><blockquote>
+<p>这是一篇介绍如何提升PHP程序性能的文章，大多数应用程序并没有真正地运用PHP的全部功能，只是简单认为只要激活了APC(APC的全称为Alternative PHP Cache，是一款开源的php插件，用来对php的代码或者用户数据进行缓存)缓存就已经极致地提升了性能。如果你对此仍有兴趣，请继续读下去。</p>
+</blockquote>
+<blockquote>
+<p>在一个大的Symfony应用程序里使用这个方法，能够使每秒处理请求量从130提升到的2000</p>
+</blockquote>
+<h2 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h2><p>先来回顾一下“历史”。<br>我们一贯的做法是使用一些众所周知的web服务器(apache、nginx等)来配合PHP处理HTTP协议并将动态请求重定向到PHP，与Apache的mod_rewrite这样的重写引擎一起变得非常强大。</p>
+<p>配置web服务器运行PHP的几种方法：</p>
+<ul>
+<li>mod_php(只适用apache)</li>
+<li>f(ast)cgi</li>
+<li>php-fpm</li>
+</ul>
+<p>考虑到安全因素，通常配置使用FCGI和<a href="http://man.chinaunix.net/newsoft/ApacheManual/suexec.html" target="_blank" rel="noopener">SuExec</a>，保证每个解释器进程都在特定的站点用户下运行。这种分离使得每个客户机无需虚拟机就可以进行大规模的托管。在本地开发机或单一的应用程序服务器使用mod_php或php-fpm是很常见的。</p>
+<p>这些配置在整个行业内都很常见。但是不得不说一下它的缺点，即使开启了<code>opcode cache</code>(操作码缓存)，每当有新的请求时，仍需要声明类、实例化类、读取缓存。正如你想象的那样，这是非常耗时的，远不是高性能配置。</p>
+<h2 id="在盒子外思考"><a href="#在盒子外思考" class="headerlink" title="在盒子外思考"></a>在盒子外思考</h2><p>那么，我们为什么要这么做呢？为什么在每次请求之后，都会销毁PHP为应用程序所建立的内存，再次请求后再重新建立内存呢？嗯，这是因为PHP起初的设计理念只是一个模板引擎、一套工具，并不是基于服务端的语言。PHP本身并不是真正的异步设计，几乎所有的功能都是“阻塞”的。多年来PHP发生巨大的变化，现在，我们使用PHP能够写出强大的模板引擎，得益于composer丰富的扩展库，PHP已经有了一个健全的“生态系统”。总之，其它语言有的我们要有，其它语言没有的我们也要有，PHP是全世界最好的语言。(原作太长，一句话概括下)。我们甚至有PHP的异步Web服务器库。</p>
+<h2 id="等等，什么？"><a href="#等等，什么？" class="headerlink" title="等等，什么？"></a>等等，什么？</h2><p>等等，我们有PHP异步库？是的，<a href="http://reactphp.org/" target="_blank" rel="noopener">我们有</a>。ReactPHP对“我”来说是一个最有前途的PHP库，它带来了事件驱动的强大概念和非阻塞I/O。运用这项技术，我们能够在PHP中编写自己的HTTP堆栈，并在每次请求结束时将其控制在内存中而不是销毁它。</p>
+<div align="center"><img src="http://marcjschmidt.de/images/morpheus-php-webserver.png"></div>
+
+<p>这很易于理解，当我们不需要实例化所有的对象时，读缓存，我们将获得更多的性能。因为大部分时间引导应用程序是响应时间的一个重要因素。当移除这些因素，它的机制就类似java、nodejs和Co那样。</p>
+<h2 id="怎么回事？"><a href="#怎么回事？" class="headerlink" title="怎么回事？"></a>怎么回事？</h2><p>So easy！只需使用<a href="http://reactphp.org" target="_blank" rel="noopener">ReactPHP</a>即可。</p>
+<p>使用composer安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer require &apos;react/react=*&apos;</span><br></pre></td></tr></table></figure></p>
+<p>然后创建文件<code>server.php</code>并调用它：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">require &apos;vendor/autoload.php&apos;;</span><br><span class="line">$i = 0;</span><br><span class="line">$app = function ($request, $response) use ($i) &#123;</span><br><span class="line">    $response-&gt;writeHead(200, array(&apos;Content-Type&apos; =&gt; &apos;text/plain&apos;));</span><br><span class="line">    $response-&gt;end(&quot;Hello World $i\n&quot;);</span><br><span class="line">    $i++;</span><br><span class="line">&#125;;</span><br><span class="line">$loop = React\EventLoop\Factory::create();</span><br><span class="line">$socket = new React\Socket\Server($loop);</span><br><span class="line">$http = new React\Http\Server($socket, $loop);</span><br><span class="line">$http-&gt;on(&apos;request&apos;, $app);</span><br><span class="line">echo &quot;Server running at http://127.0.0.1:1337\n&quot;;</span><br><span class="line">$socket-&gt;listen(1337);</span><br><span class="line">$loop-&gt;run();</span><br></pre></td></tr></table></figure></p>
+<p>现在你可以用<code>server.php</code>开始你的第一个PHP Web服务器。打开浏览器访问<code>http://127.0.0.1:1337</code>，将会看到<code>Hello World</code>的消息。应用程序是主函数，它是每个请求的入口点。</p>
+<h2 id="基准时间"><a href="#基准时间" class="headerlink" title="基准时间"></a>基准时间</h2><p>现在你可能会想，“嗯，PHP只使用一个CPU线程，它没有利用我的多核服务器的整体能力”。确实如此，但是，</p>
+<div align="center"><img src="http://marcjschmidt.de/images/morpheus-php-balancing.png"></div>
+
+<p>现在我们需要一个多核服务器来产生一些进程，(大概意思是他写了一个东西)，地址是：<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">https://github.com/php-pm/php-pm”</a></p>
+<p>看如下所示设置：</p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-with-nginx.png"></div>
+
+<p>安装程序：</p>
+<ul>
+<li>Intel(R) Xeon(R) CPU L5630, 6 Cores</li>
+<li>8GB RAM</li>
+<li>PHP 5.4.4 with APC</li>
+<li>Debian 7.1</li>
+<li>nginx/1.2.1</li>
+</ul>
+<p>PHP-FPM和React服务器都有6个子进程</p>
+<p>使用Apache HTTP服务器基准测试工具进行测试(ab)。</p>
+<p>我们现在要测试的是一个基于symfony2.4+的Web应用程序，<a href="https://github.com/jarves/jarves" target="_blank" rel="noopener">地址点这里</a>，这是一个包含模板、缓存、数据库、事件监听等多项服务的CMS系统。</p>
+<p>缓存配置只缓存基本内容，视图的结果不缓存，所以我们没有缓存更多的数据。</p>
+<p>启动React服务器的命令是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php ./bin/ppm start /path/to/symfony/ --bridge=symfony -vvv</span><br></pre></td></tr></table></figure></p>
+<p>hhvm：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hhvm ./bin/ppm start /path/to/symfony/ --bridge=symfony -vvv</span><br></pre></td></tr></table></figure></p>
+<p>结果如下：</p>
+<p><strong>每秒请求数</strong></p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-benchmark-requests.png"></div>
+
+<p><strong>内存使用</strong></p>
+<div align="center"><img src="http://marcjschmidt.de/images/reactphp-benchmark-memory.png"></div>
+
+<p><strong>说明</strong></p>
+<ul>
+<li>fpm - nginx服务后面的常规php-fpm服务</li>
+<li>react - React与内置负载均衡服务器(见上上上图)</li>
+<li>react+nginx - React与nginx负载均衡服务器。React只负责产生服务器子进程，nginx用于连接子进程。</li>
+<li>hhvm - 作为开启hhvm的React服务器</li>
+<li>hhvm+nginx - 作为开启hhvm的React+nginx服务器</li>
+</ul>
+<p>hhvm使用<code>stream_select</code>事件循环，PHP使用<code>libevent</code>，所以，我们不使用hhvm内置的Web服务器。</p>
+<p>正如我们所看到的，React+nginx负载均衡服务器比传统PHP+APC快15倍之多，每秒也可以应付2000的请求量。如果是这样的结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">	    2.000 requests / second</span><br><span class="line">    7.200.000 requests / hour</span><br><span class="line">   86.400.000 requests / half day</span><br><span class="line">  172.800.000 requests / day</span><br><span class="line">2.678.400.000 requests / half month</span><br><span class="line">5.356.800.000 requests / month</span><br></pre></td></tr></table></figure>
+<p>内存使用率几乎一样，内存连续增加可能是因为CMS内存泄露引起的。这样的环境还没有优化，请参见下面获取更多有关此方法问题的信息。</p>
+<p>(大概意思是推荐你试一试)</p>
+<h2 id="nginx负载均衡"><a href="#nginx负载均衡" class="headerlink" title="nginx负载均衡"></a>nginx负载均衡</h2><p>react+nginx和hhvm+nginx配置如下：</p>
+<p>我们在这里所做的只是代理请求而并不指向本地文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">upstream backend  &#123;</span><br><span class="line">    server 127.0.0.1:5501;</span><br><span class="line">    server 127.0.0.1:5502;</span><br><span class="line">    server 127.0.0.1:5503;</span><br><span class="line">    server 127.0.0.1:5504;</span><br><span class="line">    server 127.0.0.1:5505;</span><br><span class="line">    server 127.0.0.1:5506;</span><br><span class="line">&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    root /path/to/symfony/web/;</span><br><span class="line">    server_name servername.com</span><br><span class="line">    location / &#123;</span><br><span class="line">        if (!-f $request_filename) &#123;</span><br><span class="line">            proxy_pass http://backend;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="采用这种方法的问题"><a href="#采用这种方法的问题" class="headerlink" title="采用这种方法的问题"></a>采用这种方法的问题</h2><p>使用这种方法一定要注意的几个问题。</p>
+<p>1.我们必须更好地处理内存以避免泄漏。PHP的较新版本做得相当不错，但是在处理请求之后破坏整个应用程序的内存的旧方法并不重视这个话题。(翻译的不好)</p>
+<p>2.每次文件更改时，我们必须重新启动服务器。因为在PHP中不可能重新定义“符号”(类、方法)。我计划通过<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">PHP进程管理器</a>来解决这个问题，用它来启动子进程。</p>
+<p>3.当抛出异常时，必须重新启动服务器。我计划通过<a href="https://github.com/php-pm/php-pm" target="_blank" rel="noopener">PHP进程管理器</a>找到一个解决方案。</p>
+<p>4.尽管ReactPHP具有异步能力，但是并没有被主流框架所支持。这意味着，如果你要提升web程序的性能，必须使用异步方式重写你的应用程序。这是可以实现的，总的来说更快，但这是一项极其复杂的工程。因此，可以借鉴Node.js如何使用异步。我的意见是值得一试。</p>
+<p>5.如果你用ReactPHP重构框架，必须确保该框架能够根据请求分离其内部数据。例如，Symfony框架。</p>
+<h2 id="最后的思考"><a href="#最后的思考" class="headerlink" title="最后的思考"></a>最后的思考</h2><p><a href="http://marcjschmidt.de/blog/2014/02/08/php-high-performance.html" target="_blank" rel="noopener">原文链接</a></p>
+
+        </div></article>
+      <article class="post">
+    <header class="post-header">
+      <h1 class="post-title"><a class="post-link" href="/the-server-login-do-not-use-password/">服务器免密码登录</a>
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-05-25
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-content"><h2 id="本机配置"><a href="#本机配置" class="headerlink" title="本机配置"></a>本机配置</h2><p>1.生成<code>ssh key</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa	# 连续回车 直至生成 文件位于`~/.ssh`文件夹里</span><br></pre></td></tr></table></figure></p>
+<p>2.将<code>ssh key</code>拷贝到远程主机<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp ~/.ssh/id_rsa.pub root@192.168.8.80:/root/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure></p>
+<h2 id="远程机配置"><a href="#远程机配置" class="headerlink" title="远程机配置"></a>远程机配置</h2><p>1.创建用于存储<code>ssh key</code>的文件，并修改此文件权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch /root/.ssh/authorized_keys</span><br><span class="line">chmod 600 /root/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></p>
+<p><code>authorized_keys</code>为默认文件名，如若修改，可编辑<code>/etc/ssh/sshd_config</code>文件。</p>
+<p>2.将<code>id_rsa.pub</code>的内容追加到<code>authorized_keys</code>中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /root/.ssh/id_rsa.pub  &gt;&gt; /root/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></p>
+
+        </div></article>
+      <nav class="pagination"><a class="next" href="/page/2/">
+        <span class="next-text">下一页</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></section></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:pygroos@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/pygroos" class="iconfont icon-github" title="github"></a>
+        <a href="https://weibo.com/pygroos" class="iconfont icon-weibo" title="weibo"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">pygroos</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.10.2"></script>
+</body>
+</html>

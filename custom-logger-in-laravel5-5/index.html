@@ -1,4 +1,113 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>在Laravel5.5自定义日志文件中记录SQL语句 | 皮格鲁斯</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/normalize/8.0.1/normalize.min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">在Laravel5.5自定义日志文件中记录SQL语句</h1><a id="logo" href="/.">皮格鲁斯</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">在Laravel5.5自定义日志文件中记录SQL语句</h1><div class="post-meta">Sep 5, 2017<span> | </span><span class="category"><a href="/categories/编程/">编程</a></span></div><div class="post-content"><h2 id="为什么这样搞？"><a href="#为什么这样搞？" class="headerlink" title="为什么这样搞？"></a>为什么这样搞？</h2><p>公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了<a href="https://laravel-china.org/articles/5779/output-the-sql-statement-to-the-log-log-in-laravel#reply30802" target="_blank" rel="noopener">这个帖子</a>才渐渐有了些思路。因为线上运行的服务都配套做了<code>Error Track</code>(异常捕获)，原理是将每个接口返回的错误码全部记录到日志文件中，把日志文件按半小时分割，每隔半小时<code>Error Track</code>服务就会进行日志分析，若日志里存在错误码，则会发邮件和短信报警。现在有办法在日志文件里记录原生SQL了，接下来就该考虑如何把SQL记录到新的文件里从而不影响异常捕获程序正常运行。</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+<meta name="theme-color" content="#f8f5ec">
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+<meta name="description" content="在Laravel5.5自定义日志文件中记录SQL语句"><meta name="keywords" content="Laravel, 皮格鲁斯"><link rel="alternate" href="/default" title="皮格鲁斯"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=2.10.2">
+<link rel="canonical" href="https://pygroos.github.io/custom-logger-in-laravel5-5/">
+
+<link rel="stylesheet" type="text/css" href="/lib/fancybox/jquery.fancybox.css"><link rel="stylesheet" type="text/css" href="/lib/nprogress/nprogress.min.css">
+<link rel="stylesheet" type="text/css" href="/css/style.css?v=2.10.2">
+
+<script id="baidu_push">
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script>
+  window.config = {"leancloud":{"app_id":null,"app_key":null},"toc":true,"fancybox":true,"pjax":true};
+</script>
+
+    <title>在Laravel5.5自定义日志文件中记录SQL语句 - 皮格鲁斯</title>
+  </head>
+
+  <body><div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/." class="logo">皮格鲁斯</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list"><a href="/archives/">
+        <li class="mobile-menu-item">归档
+          </li>
+      </a><a href="/tags">
+        <li class="mobile-menu-item">标签
+          </li>
+      </a><a href="/categories">
+        <li class="mobile-menu-item">分类
+          </li>
+      </a></ul>
+</nav>
+<div class="container" id="mobile-panel">
+      <header id="header" class="header"><div class="logo-wrapper">
+  <a href="/." class="logo">皮格鲁斯</a>
+</div>
+
+<nav class="site-navbar"><ul id="menu" class="menu"><li class="menu-item">
+          <a class="menu-item-link" href="/archives/">
+            归档
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/tags">
+            标签
+            </a>
+        </li>
+      <li class="menu-item">
+          <a class="menu-item-link" href="/categories">
+            分类
+            </a>
+        </li>
+      </ul></nav>
+</header>
+
+      <main id="main" class="main">
+        <div class="content-wrapper">
+          <div id="content" class="content"><article class="post">
+    <header class="post-header">
+      <h1 class="post-title">在Laravel5.5自定义日志文件中记录SQL语句
+        </h1>
+
+      <div class="post-meta">
+        <span class="post-time">
+          2017-09-05
+        </span><span class="post-category">
+            <a href="/categories/编程/">编程</a>
+            </span>
+        </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+    <h2 class="post-toc-title">文章目录</h2>
+    <div class="post-toc-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么这样搞？"><span class="toc-text">为什么这样搞？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义日志文件"><span class="toc-text">自定义日志文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#监听SQL执行事件"><span class="toc-text">监听SQL执行事件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#补充"><span class="toc-text">补充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第二次补充"><span class="toc-text">第二次补充</span></a></li></ol>
+    </div>
+  </div><div class="post-content"><h2 id="为什么这样搞？"><a href="#为什么这样搞？" class="headerlink" title="为什么这样搞？"></a>为什么这样搞？</h2><p>公司项目繁杂且各项目连接同一数据库，时常因慢查询问题导致我们PHP组的接口响应超时(也有可能是我们自己程序的问题)。为了排除由哪些SQL执行引起的慢查询问题，我们要隔三差五跟运维部门同事要来慢查询日志进行对比分析。最近一直在想，Laravel中有无办法将Eloquent转换成原生SQL并记录下来？直到看了<a href="https://laravel-china.org/articles/5779/output-the-sql-statement-to-the-log-log-in-laravel#reply30802" target="_blank" rel="noopener">这个帖子</a>才渐渐有了些思路。因为线上运行的服务都配套做了<code>Error Track</code>(异常捕获)，原理是将每个接口返回的错误码全部记录到日志文件中，把日志文件按半小时分割，每隔半小时<code>Error Track</code>服务就会进行日志分析，若日志里存在错误码，则会发邮件和短信报警。现在有办法在日志文件里记录原生SQL了，接下来就该考虑如何把SQL记录到新的文件里从而不影响异常捕获程序正常运行。</p>
 <h2 id="自定义日志文件"><a href="#自定义日志文件" class="headerlink" title="自定义日志文件"></a>自定义日志文件</h2><p>最近刚理解了<code>trait</code>，所以这里试着用用，反正也不花钱。<br>在<code>app</code>目录下新建目录<code>Traits</code>，在<code>Traits</code>里新建文件<code>CustomLogger.php</code>，内容如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace App\Traits;</span><br><span class="line">use Monolog\Logger;</span><br><span class="line">use Illuminate\Log\Writer;</span><br><span class="line">trait CustomLogger</span><br><span class="line">&#123;</span><br><span class="line">    private static $loggers = array();</span><br><span class="line">    public function getLogger($name, $path = null, $day = 30)</span><br><span class="line">    &#123;</span><br><span class="line">        if (null === $path) &#123;</span><br><span class="line">            $path = storage_path(&apos;logs/&apos; . $name . &apos;.log&apos;);</span><br><span class="line">        &#125;</span><br><span class="line">        if (!isset(self::$loggers[$name])) &#123;</span><br><span class="line">            self::$loggers[$name] = new Writer(new Logger($name));</span><br><span class="line">            self::$loggers[$name]-&gt;useDailyFiles($path, $day);</span><br><span class="line">        &#125;</span><br><span class="line">        $log = self::$loggers[$name];</span><br><span class="line">        return $log;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>定义这样一个自定义日志性状，支持自定义日志文件名称、日志保存路径及保留时长。哪里需要就可以记哪里了。用法见下文。</p>
@@ -13,4 +122,70 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">use Illuminate\Support\Facades\Request;</span><br><span class="line">public function boot()</span><br><span class="line">&#123;</span><br><span class="line">    $log = LoggerLib::getLogger(&apos;illuminate.query&apos;);</span><br><span class="line">    DB::listen(function ($sql, $bindings, $time) use ($log) &#123;</span><br><span class="line">        $tmp = str_replace(&apos;?&apos;, &apos;&quot;&apos;.&apos;%s&apos;.&apos;&quot;&apos;, $sql);</span><br><span class="line">        $sql = vsprintf($tmp, $bindings);</span><br><span class="line">        $log-&gt;info($sql .&apos;[execute_time=&apos;.$time.&apos;ms][uri=&apos;.Request::path().&apos;]&apos;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以通过<code>[execute_time=1.24ms][uri=login]</code>这两个标识来过滤日志。比如要查看登录接口执行时间是50毫秒的SQL</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep &apos;execute_time=50.*&apos; | grep &apos;uri=login&apos; illuminate.query-2017-09-08.log</span><br></pre></td></tr></table></figure>
-</div><div class="tags"><a href="/tags/Laravel/">Laravel</a></div><div class="post-nav"><a class="pre" href="/vue-element-ui-date-picker-format/">ElementUI日期组件格式化问题</a><a class="next" href="/build-the-structure-on-a-computer-second-part/">一台电脑玩玩架构 - MySQL主从复制</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="https://pygroos.github.io"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/操作系统/">操作系统</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构/">架构</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Laravel/" style="font-size: 15px;">Laravel</a> <a href="/tags/MAC/" style="font-size: 15px;">MAC</a> <a href="/tags/PHP/" style="font-size: 15px;">PHP</a> <a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/Sublime/" style="font-size: 15px;">Sublime</a> <a href="/tags/NoSQL/" style="font-size: 15px;">NoSQL</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Vue/" style="font-size: 15px;">Vue</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/fix-mds-stores-consuming-high-cpu-usage/">解决MAC高CPU</a></li><li class="post-list-item"><a class="post-list-link" href="/mac-high-sierra-os-install-php-extension/">Mac安装PHP扩展遇到的问题</a></li><li class="post-list-item"><a class="post-list-link" href="/mysql-foreign-key-index/">MySQL外键索引</a></li><li class="post-list-item"><a class="post-list-link" href="/mac-sublime-handle-column/">Sublime操作列</a></li><li class="post-list-item"><a class="post-list-link" href="/vue-element-ui-date-picker-format/">ElementUI日期组件格式化问题</a></li><li class="post-list-item"><a class="post-list-link" href="/custom-logger-in-laravel5-5/">在Laravel5.5自定义日志文件中记录SQL语句</a></li><li class="post-list-item"><a class="post-list-link" href="/build-the-structure-on-a-computer-second-part/">一台电脑玩玩架构 - MySQL主从复制</a></li><li class="post-list-item"><a class="post-list-link" href="/build-the-structure-on-a-computer-first-part/">一台电脑玩玩架构 - Nginx反向代理</a></li><li class="post-list-item"><a class="post-list-link" href="/bring-high-performance-into-your-php-app/">(译)提升PHP程序性能</a></li><li class="post-list-item"><a class="post-list-link" href="/the-server-login-do-not-use-password/">服务器免密码登录</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">皮格鲁斯.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//lib.baomitu.com/fancybox/3.5.2/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+
+      </div>
+      <div class="post-copyright">
+    <p class="copyright-item">
+      <span>原文作者: </span>
+      <a href="https://pygroos.github.io">pygroos</a>
+    </p>
+    <p class="copyright-item">
+      <span>原文链接: </span>
+      <a href="https://pygroos.github.io/custom-logger-in-laravel5-5/">https://pygroos.github.io/custom-logger-in-laravel5-5/</a>
+    </p>
+    <p class="copyright-item">
+      <span>许可协议: </span><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">知识共享署名-非商业性使用 4.0 国际许可协议</a>
+    </p>
+  </div>
+      <footer class="post-footer">
+        <div class="post-tags">
+            <a href="/tags/Laravel/">Laravel</a>
+            </div>
+        
+        <nav class="post-nav"><a class="prev" href="/vue-element-ui-date-picker-format/">
+        <i class="iconfont icon-left"></i>
+        <span class="prev-text nav-default">ElementUI日期组件格式化问题</span>
+        <span class="prev-text nav-mobile">上一篇</span>
+      </a>
+    <a class="next" href="/build-the-structure-on-a-computer-second-part/">
+        <span class="next-text nav-default">一台电脑玩玩架构 - MySQL主从复制</span>
+        <span class="prev-text nav-mobile">下一篇</span>
+        <i class="iconfont icon-right"></i>
+      </a>
+    </nav></footer>
+    </article></div><div class="comments" id="comments"></div></div>
+      </main>
+
+      <footer id="footer" class="footer"><div class="social-links"><a href="mailto:pygroos@gmail.com" class="iconfont icon-email" title="email"></a>
+        <a href="https://github.com/pygroos" class="iconfont icon-github" title="github"></a>
+        <a href="https://weibo.com/pygroos" class="iconfont icon-weibo" title="weibo"></a>
+        <a href="/atom.xml" class="iconfont icon-rss" title="rss"></a>
+    </div><div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://hexo.io/">Hexo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/ahonn/hexo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">&copy;2015 - 2019<span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">pygroos</span>
+  </span>
+</div>
+</footer>
+
+      <div class="back-to-top" id="back-to-top">
+        <i class="iconfont icon-up"></i>
+      </div>
+    </div><script type="text/javascript" src="/lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/lib/pjax/jquery.pjax.min.js"></script>
+  <script type="text/javascript" src="/lib/nprogress/nprogress.min.js"></script>
+  <script type="text/javascript" src="/js/src/even.js?v=2.10.2"></script>
+</body>
+</html>
