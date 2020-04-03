@@ -103,6 +103,16 @@
 <p>配置完成，就可以在Zeppelin里写SQL了。</p>
 <div align="center"><img src="/images/zeppelin-3.jpg"></div>
 
+<p>最后就是Spark连接MySQL读取数据了，因为我想要做的仅仅是从MySQL取点数据出来练习分析一下。前面已经配置可以成功连接MySQL，以为大功告成，事实证明不要以为你以为的就是你以为的。我以为已经配置好了连接MySQL，但是运行代码还是提示找不到连接MySQL的驱动，开始以为是代码问题，找网上找了不下十种连接方式，无一成功的。后来才意识到，之前配置的只是Zeppelin连接MySQL，跟Spark没有半毛钱关系，所以还要把MySQL jar包拷贝到<code>/usr/local/Cellar/apache-spark/2.4.5/libexec/jars</code>这个目录下。</p>
+<p>可以看到如下效果。</p>
+<div align="center"><img src="/images/zeppelin-1.jpg"></div>
+
+
+
+
+
+
+
 
       </div>
       <div class="post-copyright">
