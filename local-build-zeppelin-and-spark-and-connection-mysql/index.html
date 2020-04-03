@@ -91,7 +91,19 @@
         </span></div>
     </header>
 
-    <div class="post-content">
+    <div class="post-content"><p>花了半天时间在本地搭建好了Zeppelin、Spark环境，最终在连接MySQL读取数据的时候踩了许多坑，所以有必要整理记录下。</p>
+<p>Spark安装就不细说了，使用<code>brew install apache-spark</code>，安装过程没什么问题。</p>
+<p>Zeppelin下载页面是一个<code>0.9.0</code>的预发版本，不要下载这个版本，下拉选择<code>0.8.1</code>或<code>0.8.2</code>Old releases。Zeppelin下载完成直接解压就可以使用。<br>进入bin目录执行<code>./zeppelin-daemon.sh start</code>，Zeppelin就启动了。浏览器访问<code>http://localhost:8080</code>打开页面。</p>
+<p>接下来说一下Zeppelin配置jdbc driver连接MySQL的问题。首先，新建一个interpreters，Interpreter group选择jdbc。<code>0.9.0</code>的预发版本没有jdbc这个Interpreter group，所以才在下载的时候选了旧版本。</p>
+<div align="center"><img src="/images/zeppelin-2.jpg"></div>
+
+<p>按照官方文档示例的配置，其实是有问题的，MySQL jar包一定要选择匹配的版本，<code>mysql-connector-java-5.1.38.jar</code>下载这个即可。最终在配置<code>Dependencies</code>的时候，并不是如官方文档所示，添加<code>mysql:mysql-connector-java:5.1.38</code>至少我是没连接成功。这里要填写你的MySQL jar包所在路径才行，如<code>/usr/local/zeppelin/interpreter/mysql/mysql-connector-java-5.1.38.jar</code></p>
+<div align="center"><img src="/images/zeppelin.jpg"></div>
+
+<p>配置完成，就可以在Zeppelin里写SQL了。</p>
+<div align="center"><img src="/images/zeppelin-3.jpg"></div>
+
+
       </div>
       <div class="post-copyright">
     <p class="copyright-item">
